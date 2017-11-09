@@ -7,15 +7,15 @@ pub mod parser;
 
 #[test]
 fn parser() {
-    assert_eq!(&format!("{:?}", parser::parse_Exprs("").unwrap()),
+    assert_eq!(&format!("{:?}", parser::parse_Expr("").unwrap()),
                                "[]");
-    assert_eq!(&format!("{:?}", parser::parse_Exprs("22 * 44 + 66").unwrap()),
+    assert_eq!(&format!("{:?}", parser::parse_Expr("22 * 44 + 66").unwrap()),
                                "[((22 * 44) + 66)]");
-    assert_eq!(&format!("{:?}", parser::parse_Exprs("22 * 44 + 66,").unwrap()),
+    assert_eq!(&format!("{:?}", parser::parse_Expr("22 * 44 + 66,").unwrap()),
                                "[((22 * 44) + 66)]");
-    assert_eq!(&format!("{:?}", parser::parse_Exprs("22 * 44 + 66, 13*3").unwrap()),
+    assert_eq!(&format!("{:?}", parser::parse_Expr("22 * 44 + 66, 13*3").unwrap()),
                                "[((22 * 44) + 66), (13 * 3)]");
-    assert_eq!(&format!("{:?}", parser::parse_Exprs("22 * 44 + 66, 13*3,").unwrap()),
+    assert_eq!(&format!("{:?}", parser::parse_Expr("22 * 44 + 66, 13*3,").unwrap()),
                                "[((22 * 44) + 66), (13 * 3)]");
 }
 
@@ -26,6 +26,6 @@ fn main() {
             println!("Please pass an expression to parse")
         }
         else {
-            println!("{:?}", parser::parse_Exprs(&args[1])) 
+            println!("{:?}", parser::parse_Expr(&args[1])) 
         }
 }

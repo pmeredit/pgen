@@ -10,8 +10,8 @@ pub enum Expr {
 
 #[derive(Debug)]
 pub struct Let {
-    bindings: Vec<(Box<Expr>, Box<Expr>)>,
-    expr: Box<Expr>,
+    pub assignments: Vec<(String, Box<Expr>)>,
+    pub expr: Box<Expr>,
 }
 
 #[derive(Copy, Clone)]

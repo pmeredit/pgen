@@ -1,9 +1,9 @@
 use std::str::FromStr;
-use ast::{Expr, Opcode};
+use ast::{Expr, Opcode, Let};
 
 grammar;
 
-pub Exprs = List<Expr, ",">;
+Assignments = List<Assignment, ",">;
 
 List<T, Sep>: Vec<T> = { // (0)
     <v:(<T> Sep)*> <e:T?> => match e { // (1)
@@ -21,14 +21,18 @@ Tier<Op,NextTier>: Box<Expr> = {
     NextTier
 };
 
-Assignments = List<Assignment, ",">;
+
+
+pub Expr = { Tier<ExprOp, Factor>,
+         "let" <a:Assignments> "in" <e:Expr> => 
+	 	Box::new(Expr::Let(
+		    Box::new(Let{assignments: a, expr: e}))) 
+       };
+Factor = Tier<FactorOp, Term>;
 
 Assignment: (String, Box<Expr>) = {
     <id:ID> "=" <val:Expr> => (id, val)
 };
-
-Expr = Tier<ExprOp, Factor>;
-Factor = Tier<FactorOp, Term>;
 
 ExprOp: Opcode = { // (3)
     "+" => Opcode::Add,
