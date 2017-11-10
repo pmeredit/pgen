@@ -3,26 +3,7 @@ use ast::{Expr, Opcode, Let, Cond, Switch};
 
 grammar;
 
-Assignments = List<Assignment, ",">;
-Args = List<TopExpr, ",">;
-Cases = List<Case, ",">;
-
-List<T, Sep>: Vec<T> = { 
-    <v:(<T> Sep)*> <e:T?> => match e {
-        None=> v,
-        Some(e) => {
-            let mut v = v;
-            v.push(e);
-            v
-        }
-    }
-};
-
-Tier<Op,NextTier>: Box<Expr> = {
-    Tier<Op,NextTier> Op NextTier => Box::new(Expr::Op(<>)),
-    NextTier
-};
-
+pub Pipeline = List<PipelineItem, ";">;
 
 pub TopExpr: Box<Expr> =  { 
     "let" <a:Assignments> "in" <e:TopExpr> => 
@@ -37,19 +18,49 @@ pub TopExpr: Box<Expr> =  {
     OrExpr,
 };
 
+PipelineItem: (String, Box<Expr>) = {
+    <id:ID> ":" <o:TopExpr> => (id, o)
+};
+
+
+Assignment: (String, Box<Expr>) = {
+    <id:ID> "=" <val:TopExpr> => (id, val)
+};
+
+ObjItem: (String, Box<Expr>) = {
+    <k:Str> ":" <v:TopExpr> => (k, v)
+};
+
+Case: (Box<Expr>, Box<Expr>) = {
+    <c:OrExpr> "=>" <e:TopExpr> => (c, e)
+};
+
+List<T, Sep>: Vec<T> = { 
+    <v:(<T> Sep)*> <e:T?> => match e {
+        None=> v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
+
+Assignments = List<Assignment, ",">;
+Args        = List<TopExpr, ",">;
+Cases       = List<Case, ",">;
+ObjItems    = List<ObjItem, ",">;
+
+Tier<Op,NextTier>: Box<Expr> = {
+    Tier<Op,NextTier> Op NextTier => Box::new(Expr::Op(<>)),
+    NextTier
+};
+
 OrExpr      = Tier<OrOp,      AndExpr     >;
 AndExpr     = Tier<AndOp,     CompareExpr >;
 CompareExpr = Tier<CompareOp, AddExpr     >;
 AddExpr     = Tier<AddOp,     MulExpr     >;
 MulExpr     = Tier<MulOp,     BottomExpr  >;
-
-Assignment: (String, Box<Expr>) = {
-    <id:ID> "=" <val:OrExpr> => (id, val)
-};
-
-Case: (Box<Expr>, Box<Expr>) = {
-    <c:OrExpr> "=>" <e:OrExpr> => (c,e)
-};
 
 OrOp: Opcode = {
     "or" => Opcode::Or,
@@ -80,16 +91,27 @@ BottomExpr: Box<Expr> = {
     "null" => Box::new(Expr::Null),
     Str    => Box::new(Expr::Str(<>)),
     Bool   => Box::new(Expr::Bool(<>)),
-    Num    => Box::new(Expr::Number(<>)),
+    Number => Box::new(Expr::Number(<>)),
+    Float  => Box::new(Expr::Float(<>)),
     ID     => Box::new(Expr::ID(<>)),
     Col    => Box::new(Expr::Col(<>)),
+    Array  => Box::new(Expr::Array(<>)),
+    Object => Box::new(Expr::Object(<>)),
     <id:ID> "(" <args:Args> ")" => Box::new(Expr::App(id, args)),
     "(" <TopExpr> ")",
 };
 
+Object: Vec<(String, Box<Expr>)> = {
+   "{" <ObjItems> "}",
+};
+
+Array: Vec<Box<Expr>> = {
+   "[" <Args> "]", 
+};
+
 Str: String = {
    // '\'' panics lalrpop, so we have to use \u{0027} for a single quote
-   r"'.*'" => String::from(<>.trim_matches('\u{0027}'))
+   r"'[^']*'" => String::from(<>.trim_matches('\u{0027}'))
 };
 
 Bool: bool = {
@@ -97,8 +119,12 @@ Bool: bool = {
    "false" => false,
 };
 
-Num: i32 = {
-    r"[0-9]+" => i32::from_str(<>).unwrap()
+Number: i64 = {
+    r"-?[0-9]+" => i64::from_str(<>).unwrap()
+};
+
+Float: f64 = {
+    r"-?([0-9]*[.][0-9]+)" => f64::from_str(<>).unwrap()
 };
 
 Col: String = {

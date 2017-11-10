@@ -1,7 +1,8 @@
 use std::fmt::{Debug, Formatter, Error};
 
 pub enum Expr {
-    Number(i32),
+    Number(i64),
+    Float(f64),
     Bool(bool),
     Null,
     Str(String),
@@ -12,6 +13,8 @@ pub enum Expr {
     Switch(Box<Switch>),
     Let(Box<Let>),
     App(String, Vec<Box<Expr>>),
+    Array(Vec<Box<Expr>>),
+    Object(Vec<(String, Box<Expr>)>),
     Error,
 }
 
@@ -71,18 +74,21 @@ impl Debug for Expr {
     fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
         use self::Expr::*;
         match *self {
-            Number(n) => write!(fmt, "{:?}", n),
-            Null => write!(fmt, "<null>"),
-            Str(ref s) => write!(fmt, "Str({:?})", s),
-            Bool(b) => write!(fmt, "{:?}", b),
-            ID(ref s) => write!(fmt, "ID({:?})", s),
-            Col(ref s) => write!(fmt, "Col({:?})", s),
+            Number(n)            => write!(fmt, "{:?}", n),
+            Float(f)             => write!(fmt, "{:?}", f),
+            Null                 => write!(fmt, "<null>"),
+            Str(ref s)           => write!(fmt, "Str({:?})", s),
+            Bool(b)              => write!(fmt, "{:?}", b),
+            ID(ref s)            => write!(fmt, "ID({:?})", s),
+            Col(ref s)           => write!(fmt, "Col({:?})", s),
             Op(ref l, op, ref r) => write!(fmt, "({:?} {:?} {:?})", l, op, r),
-            Let(ref l) => write!(fmt, "{:?}", l),
-            Cond(ref c) => write!(fmt, "\nif {:?}\nthen {:?}\nelse {:?}\n", c.cond, c.then, c.otherwise),
-            Switch(ref s) => write!(fmt, "{:?}", s), 
-            App(ref s, ref v) => write!(fmt, "App({:?}({:?}))", s, v),
-            Error => write!(fmt, "error"),
+            Let(ref l)           => write!(fmt, "{:?}", l),
+            Cond(ref c)          => write!(fmt, "\nif {:?}\nthen {:?}\nelse {:?}\n", c.cond, c.then, c.otherwise),
+            Switch(ref s)        => write!(fmt, "{:?}", s), 
+            App(ref s, ref v)    => write!(fmt, "App({:?}({:?}))", s, v),
+            Array(ref v)         => write!(fmt, "{:?}", v),
+            Object(ref v)        => format_obj(fmt, v),
+            Error                => write!(fmt, "error"),
         }
     }
 }
@@ -103,5 +109,13 @@ impl Debug for Opcode {
             Or  => write!(fmt, "or"),
         }
     }
+}
+
+fn format_obj(fmt: &mut Formatter, obj: &Vec<(String, Box<Expr>)>) -> Result<(), Error> {
+    let _ = write!(fmt, "{{");
+    for &(ref key, ref val) in obj {
+        let _ = write!(fmt, "{:?}: {:?}", key, val);
+    }
+    write!(fmt, "}}")
 }
 

@@ -54,6 +54,18 @@ in
   (ID(\"z\") + App(\"foo\"([(41 + ID(\"y\"))])))
 ]))"
     ));
+
+    assert_eq!(&format!("{:?}", parser::parse_TopExpr("{'zed' : [1,let x = 3 in x+42,3+x], 'hello' : 'world'}").unwrap()),
+indoc!(
+"
+{\"zed\": [1, 
+let
+  \"x\"=3
+in
+  (ID(\"x\") + 42)
+, (3 + ID(\"x\"))]\"hello\": Str(\"world\")}
+"
+    ));
 }
 
 #[cfg(not(test))]
@@ -65,6 +77,6 @@ fn main() {
             println!("Please pass an expression to parse")
         }
         else {
-            println!("{:?}", parser::parse_TopExpr(&args[1])) 
+            println!("{:?}", parser::parse_Pipeline(&args[1])) 
         }
 }
