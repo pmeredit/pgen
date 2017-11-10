@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate lazy_static;
-
 use std::collections::HashSet;
 
 macro_rules! set {
@@ -20,7 +17,7 @@ macro_rules! set {
 
 // TODO: $meta
 lazy_static! {
-    static ref FUNCTIONS: HashSet<&'static str> =
+    pub static ref FUNCTIONS: HashSet<&'static str> =
         set!["not",
              "setEquals",
              "setIntersection",

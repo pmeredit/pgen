@@ -6,8 +6,13 @@ extern crate lalrpop_util;
 #[macro_use]
 extern crate indoc;
 
+#[macro_use]
+extern crate lazy_static;
+
 pub mod ast;
 pub mod parser;
+pub mod sanity;
+pub mod mongo_functions;
 
 #[test]
 fn parse_topexpr_test() {
