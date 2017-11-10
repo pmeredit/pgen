@@ -1,0 +1,12 @@
+project: {
+	'x':true, 
+	'y': 3 + (let z = $y 
+		   in foo(z,3.4,-23,[1,2,3,4])
+		 ) + 23
+	}; 
+match: {
+	'hello' : 42
+       }; 
+sort: {
+	'world' : -1
+      };

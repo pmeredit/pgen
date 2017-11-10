@@ -10,7 +10,7 @@ pub mod ast;
 pub mod parser;
 
 #[test]
-fn parser() {
+fn parse_topexpr_test() {
     
 
     assert_eq!(&format!("{:?}", parser::parse_TopExpr("22 * 44 + 66").unwrap()),
@@ -63,20 +63,41 @@ let
   \"x\"=3
 in
   (ID(\"x\") + 42)
-, (3 + ID(\"x\"))]\"hello\": Str(\"world\")}
+, (3 + ID(\"x\"))],\"hello\": Str(\"world\"),}
 "
     ));
+}
+
+#[test]
+fn parse_pipeline_test() {
+    assert_eq!(&format!("{:?}", parser::parse_Pipeline("project: {'x':true, 'y': 3 + (let z = $y in foo(z,3.4,-23,[1,2,3,4])) + 23}; match: {'hello' : 42}; sort: {'world' : -1}").unwrap()),
+indoc!(
+"
+[(\"project\", {\"x\": true,\"y\": ((3 + 
+let
+  \"z\"=Col(\"$y\")
+in
+  App(\"foo\"([ID(\"z\"), 3.4, -23, [1, 2, 3, 4]]))
+) + 23),}), (\"match\", {\"hello\": 42,}), (\"sort\", {\"world\": -1,})]
+"
+));
+
 }
 
 #[cfg(not(test))]
 fn main() {
         use std::env;
-        
+        use std::fs::File;
+        use std::io::prelude::*;
+
         let args: Vec<_> = env::args().collect();
         if args.len() < 2 {
             println!("Please pass an expression to parse")
         }
         else {
-            println!("{:?}", parser::parse_Pipeline(&args[1])) 
+            let mut f = File::open(&args[1]).expect("File Not Found");
+            let mut contents = String::new();
+            f.read_to_string(&mut contents).expect("Could Not Read File");
+            println!("{:?}", parser::parse_Pipeline(&contents)) 
         }
 }

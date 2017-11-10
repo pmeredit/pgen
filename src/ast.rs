@@ -114,7 +114,7 @@ impl Debug for Opcode {
 fn format_obj(fmt: &mut Formatter, obj: &Vec<(String, Box<Expr>)>) -> Result<(), Error> {
     let _ = write!(fmt, "{{");
     for &(ref key, ref val) in obj {
-        let _ = write!(fmt, "{:?}: {:?}", key, val);
+        let _ = write!(fmt, "{:?}: {:?},", key, val);
     }
     write!(fmt, "}}")
 }
