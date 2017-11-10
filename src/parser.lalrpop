@@ -4,6 +4,7 @@ use ast::{Expr, Opcode, Let};
 grammar;
 
 Assignments = List<Assignment, ",">;
+Args = List<Expr, ",">;
 
 List<T, Sep>: Vec<T> = { // (0)
     <v:(<T> Sep)*> <e:T?> => match e { // (1)
@@ -26,7 +27,7 @@ Tier<Op,NextTier>: Box<Expr> = {
 pub Expr = { Tier<ExprOp, Factor>,
          "let" <a:Assignments> "in" <e:Expr> => 
 	 	Box::new(Expr::Let(
-		    Box::new(Let{assignments: a, expr: e}))) 
+		    Box::new(Let{assignments: a, expr: e}))),
        };
 Factor = Tier<FactorOp, Term>;
 
@@ -46,12 +47,18 @@ FactorOp: Opcode = {
 
 Term: Box<Expr> = {
     Num => Box::new(Expr::Number(<>)),
-    ID => Box::new(Expr::ID(<>)),
-    "(" <Expr> ")"
+    ID  => Box::new(Expr::ID(<>)),
+    Col => Box::new(Expr::Col(<>)),
+    <id:ID> "(" <args:Args> ")" => Box::new(Expr::App(id, args)),
+    "(" <Expr> ")",
 };
 
 Num: i32 = {
     r"[0-9]+" => i32::from_str(<>).unwrap()
+};
+
+Col: String = {
+    r"\$\w+" => String::from(<>)
 };
 
 ID: String = {
