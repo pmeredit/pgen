@@ -1,5 +1,5 @@
 use std::str::FromStr;
-use ast::{Expr, Opcode, Let};
+use ast::{Expr, Opcode, Let, Cond};
 
 grammar;
 
@@ -23,12 +23,17 @@ Tier<Op,NextTier>: Box<Expr> = {
 };
 
 
+pub TopExpr: Box<Expr> =  { 
+    Expr,
+    "let" <a:Assignments> "in" <e:Expr> => 
+ 	Box::new(Expr::Let(
+	    Box::new(Let{assignments: a, expr: e}))),
+    "if" <i:Expr> "then" <t:Expr> "else" <e:Expr> =>
+     	Box::new(Expr::Cond(
+	    Box::new(Cond{cond:i, then:t, otherwise:e}))),
+};
 
-pub Expr = { Tier<ExprOp, Factor>,
-         "let" <a:Assignments> "in" <e:Expr> => 
-	 	Box::new(Expr::Let(
-		    Box::new(Let{assignments: a, expr: e}))),
-       };
+Expr = Tier<ExprOp, Factor>;
 Factor = Tier<FactorOp, Term>;
 
 Assignment: (String, Box<Expr>) = {
@@ -46,11 +51,17 @@ FactorOp: Opcode = {
 };
 
 Term: Box<Expr> = {
+    Bool => Box::new(Expr::Bool(<>)),
     Num => Box::new(Expr::Number(<>)),
     ID  => Box::new(Expr::ID(<>)),
     Col => Box::new(Expr::Col(<>)),
     <id:ID> "(" <args:Args> ")" => Box::new(Expr::App(id, args)),
-    "(" <Expr> ")",
+    "(" <TopExpr> ")",
+};
+
+Bool: bool = {
+   "true" => true,
+   "false" => false,
 };
 
 Num: i32 = {
