@@ -7,6 +7,7 @@ pub enum Expr {
     Col(String),
     Op(Box<Expr>, Opcode, Box<Expr>),
     Cond(Box<Cond>),
+    Switch(Box<Switch>),
     Let(Box<Let>),
     App(String, Vec<Box<Expr>>),
     Error,
@@ -21,6 +22,11 @@ pub struct Cond {
     pub cond: Box<Expr>,
     pub then: Box<Expr>,
     pub otherwise: Box<Expr>,
+}
+
+pub struct Switch {
+    pub cases: Vec<(Box<Expr>, Box<Expr>)>,
+    pub default: Box<Expr>,
 }
 
 #[derive(Copy, Clone)]
@@ -42,6 +48,17 @@ impl Debug for Let {
     }
 }
 
+impl Debug for Switch {
+    fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
+        let Switch{cases: ref cs, default: ref d} = *self;
+        let _ = write!(fmt, "\nswitch{{\n");
+        for &(ref cond, ref then) in cs {
+            let _ = write!(fmt, "  {:?} => {:?}\n", cond, then);
+        }
+        write!(fmt, "  default: {:?}\n}}", d)
+    }
+}
+
 impl Debug for Expr {
     fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
         use self::Expr::*;
@@ -53,6 +70,7 @@ impl Debug for Expr {
             Op(ref l, op, ref r) => write!(fmt, "({:?} {:?} {:?})", l, op, r),
             Let(ref l) => write!(fmt, "{:?}", l),
             Cond(ref c) => write!(fmt, "\nif {:?}\nthen {:?}\nelse {:?}\n", c.cond, c.then, c.otherwise),
+            Switch(ref s) => write!(fmt, "{:?}", s), 
             App(ref s, ref v) => write!(fmt, "App({:?}({:?}))", s, v),
             Error => write!(fmt, "error"),
         }

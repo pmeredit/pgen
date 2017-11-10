@@ -1,10 +1,11 @@
 use std::str::FromStr;
-use ast::{Expr, Opcode, Let, Cond};
+use ast::{Expr, Opcode, Let, Cond, Switch};
 
 grammar;
 
 Assignments = List<Assignment, ",">;
 Args = List<Expr, ",">;
+Cases = List<Case, ",">;
 
 List<T, Sep>: Vec<T> = { // (0)
     <v:(<T> Sep)*> <e:T?> => match e { // (1)
@@ -25,12 +26,15 @@ Tier<Op,NextTier>: Box<Expr> = {
 
 pub TopExpr: Box<Expr> =  { 
     Expr,
-    "let" <a:Assignments> "in" <e:Expr> => 
+    "let" <a:Assignments> "in" <e:TopExpr> => 
  	Box::new(Expr::Let(
 	    Box::new(Let{assignments: a, expr: e}))),
     "if" <i:Expr> "then" <t:Expr> "else" <e:Expr> =>
      	Box::new(Expr::Cond(
 	    Box::new(Cond{cond:i, then:t, otherwise:e}))),
+    "switch" "{"  <c:Cases> "default" ":" <d:Expr> "}" =>
+    	Box::new(Expr::Switch(
+	    Box::new(Switch{cases:c, default:d}))),
 };
 
 Expr = Tier<ExprOp, Factor>;
@@ -38,6 +42,10 @@ Factor = Tier<FactorOp, Term>;
 
 Assignment: (String, Box<Expr>) = {
     <id:ID> "=" <val:Expr> => (id, val)
+};
+
+Case: (Box<Expr>, Box<Expr>) = {
+    <c:Expr> "=>" <e:Expr> => (c,e)
 };
 
 ExprOp: Opcode = { // (3)
