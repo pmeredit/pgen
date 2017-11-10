@@ -12,13 +12,14 @@ pub mod parser;
 #[test]
 fn parser() {
     
+
     assert_eq!(&format!("{:?}", parser::parse_TopExpr("22 * 44 + 66").unwrap()),
                                "((22 * 44) + 66)");
     assert_eq!(&format!("{:?}", parser::parse_TopExpr("3 + (let x=1 in x) + $y + (if foo(x,y,z) then false else x)").unwrap()),
 indoc!(
 "(((3 + 
 let
-  ID(\"x\")=1
+  \"x\"=1
 in
   ID(\"x\")
 ) + Col(\"$y\")) + 
@@ -27,20 +28,32 @@ then false
 else ID(\"x\")
 )
 "));
-    assert_eq!(&format!("{:?}", parser::parse_TopExpr("let x = 2 in switch{ x+4 => x, true => y default: 4}").unwrap()),
+
+    assert_eq!(&format!("{:?}", parser::parse_TopExpr("let x = 2 in switch{ x+4 => x, true => y default: '42'}").unwrap()),
 indoc!(
 "\n
 let
-  ID(\"x\")=2
+  \"x\"=2
 in
   
 switch{
   (ID(\"x\") + 4) => ID(\"x\")
   true => ID(\"y\")
-  default: 4
+  default: Str(\"42\")
 }
 
 "));
+
+    assert_eq!(&format!("{:?}", parser::parse_TopExpr("foo($x==3 or $y and $z <= null, let z=3,y=42 in z+foo(41+y))").unwrap()),
+indoc!(
+"App(\"foo\"([((Col(\"$x\") == 3) or (Col(\"$y\") and (Col(\"$z\") <= <null>))), 
+let
+  \"z\"=3
+  \"y\"=42
+in
+  (ID(\"z\") + App(\"foo\"([(41 + ID(\"y\"))])))
+]))"
+    ));
 }
 
 #[cfg(not(test))]

@@ -3,6 +3,8 @@ use std::fmt::{Debug, Formatter, Error};
 pub enum Expr {
     Number(i32),
     Bool(bool),
+    Null,
+    Str(String),
     ID(String),
     Col(String),
     Op(Box<Expr>, Opcode, Box<Expr>),
@@ -35,6 +37,12 @@ pub enum Opcode {
     Div,
     Add,
     Sub,
+    Eq,
+    Neq,
+    Lte,
+    Gte,
+    And,
+    Or,
 }
 
 impl Debug for Let {
@@ -42,7 +50,7 @@ impl Debug for Let {
         let Let{assignments: ref a, expr: ref e} = *self;
         let _ = write!(fmt, "\nlet\n");
         for &(ref var, ref expr) in a {
-            let _ = write!(fmt, "  ID({:?})={:?}\n", var, expr);
+            let _ = write!(fmt, "  {:?}={:?}\n", var, expr);
         }
         write!(fmt, "in\n  {:?}\n", e)
     }
@@ -64,6 +72,8 @@ impl Debug for Expr {
         use self::Expr::*;
         match *self {
             Number(n) => write!(fmt, "{:?}", n),
+            Null => write!(fmt, "<null>"),
+            Str(ref s) => write!(fmt, "Str({:?})", s),
             Bool(b) => write!(fmt, "{:?}", b),
             ID(ref s) => write!(fmt, "ID({:?})", s),
             Col(ref s) => write!(fmt, "Col({:?})", s),
@@ -85,6 +95,12 @@ impl Debug for Opcode {
             Div => write!(fmt, "/"),
             Add => write!(fmt, "+"),
             Sub => write!(fmt, "-"),
+            Eq  => write!(fmt, "=="),
+            Neq => write!(fmt, "!="),
+            Lte => write!(fmt, "<="),
+            Gte => write!(fmt, ">="),
+            And => write!(fmt, "and"),
+            Or  => write!(fmt, "or"),
         }
     }
 }

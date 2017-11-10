@@ -4,11 +4,11 @@ use ast::{Expr, Opcode, Let, Cond, Switch};
 grammar;
 
 Assignments = List<Assignment, ",">;
-Args = List<Expr, ",">;
+Args = List<TopExpr, ",">;
 Cases = List<Case, ",">;
 
-List<T, Sep>: Vec<T> = { // (0)
-    <v:(<T> Sep)*> <e:T?> => match e { // (1)
+List<T, Sep>: Vec<T> = { 
+    <v:(<T> Sep)*> <e:T?> => match e {
         None=> v,
         Some(e) => {
             let mut v = v;
@@ -25,46 +25,71 @@ Tier<Op,NextTier>: Box<Expr> = {
 
 
 pub TopExpr: Box<Expr> =  { 
-    Expr,
     "let" <a:Assignments> "in" <e:TopExpr> => 
  	Box::new(Expr::Let(
 	    Box::new(Let{assignments: a, expr: e}))),
-    "if" <i:Expr> "then" <t:Expr> "else" <e:Expr> =>
+    "if" <i:OrExpr> "then" <t:OrExpr> "else" <e:OrExpr> =>
      	Box::new(Expr::Cond(
 	    Box::new(Cond{cond:i, then:t, otherwise:e}))),
-    "switch" "{"  <c:Cases> "default" ":" <d:Expr> "}" =>
+    "switch" "{"  <c:Cases> "default" ":" <d:OrExpr> "}" =>
     	Box::new(Expr::Switch(
 	    Box::new(Switch{cases:c, default:d}))),
+    OrExpr,
 };
 
-Expr = Tier<ExprOp, Factor>;
-Factor = Tier<FactorOp, Term>;
+OrExpr      = Tier<OrOp,      AndExpr     >;
+AndExpr     = Tier<AndOp,     CompareExpr >;
+CompareExpr = Tier<CompareOp, AddExpr     >;
+AddExpr     = Tier<AddOp,     MulExpr     >;
+MulExpr     = Tier<MulOp,     BottomExpr  >;
 
 Assignment: (String, Box<Expr>) = {
-    <id:ID> "=" <val:Expr> => (id, val)
+    <id:ID> "=" <val:OrExpr> => (id, val)
 };
 
 Case: (Box<Expr>, Box<Expr>) = {
-    <c:Expr> "=>" <e:Expr> => (c,e)
+    <c:OrExpr> "=>" <e:OrExpr> => (c,e)
 };
 
-ExprOp: Opcode = { // (3)
+OrOp: Opcode = {
+    "or" => Opcode::Or,
+};
+
+AndOp: Opcode = {
+    "and" => Opcode::And,
+};
+
+CompareOp: Opcode = {
+    "==" => Opcode::Eq,
+    "!=" => Opcode::Neq,
+    "<=" => Opcode::Lte,
+    ">=" => Opcode::Gte,
+};
+
+AddOp: Opcode = { 
     "+" => Opcode::Add,
     "-" => Opcode::Sub,
 };
 
-FactorOp: Opcode = {
+MulOp: Opcode = {
     "*" => Opcode::Mul,
     "/" => Opcode::Div,
 };
 
-Term: Box<Expr> = {
-    Bool => Box::new(Expr::Bool(<>)),
-    Num => Box::new(Expr::Number(<>)),
-    ID  => Box::new(Expr::ID(<>)),
-    Col => Box::new(Expr::Col(<>)),
+BottomExpr: Box<Expr> = {
+    "null" => Box::new(Expr::Null),
+    Str    => Box::new(Expr::Str(<>)),
+    Bool   => Box::new(Expr::Bool(<>)),
+    Num    => Box::new(Expr::Number(<>)),
+    ID     => Box::new(Expr::ID(<>)),
+    Col    => Box::new(Expr::Col(<>)),
     <id:ID> "(" <args:Args> ")" => Box::new(Expr::App(id, args)),
     "(" <TopExpr> ")",
+};
+
+Str: String = {
+   // '\'' panics lalrpop, so we have to use \u{0027} for a single quote
+   r"'.*'" => String::from(<>.trim_matches('\u{0027}'))
 };
 
 Bool: bool = {
