@@ -199,6 +199,7 @@ dependencies = [
  "indoc 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "lalrpop 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "lalrpop-util 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lazy_static 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
