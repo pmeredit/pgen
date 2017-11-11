@@ -111,7 +111,7 @@ Array: Vec<Box<Expr>> = {
 
 Str: String = {
    // '\'' panics lalrpop, so we have to use \u{0027} for a single quote
-   r"'[^']*'" => String::from(<>.trim_matches('\u{0027}'))
+   r"'([^'\\]|\\.)*'" => String::from(&<>[1..<>.len()-1])
 };
 
 Bool: bool = {
