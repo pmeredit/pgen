@@ -3,7 +3,8 @@ project: {
 	'y': 3 + (let z = $y 
 		   in foo(z,3.4,-23,[1,2,3,4])
 		 ) + 23,
-         'z': 'foo \'bar\' \'car\''
+         'z': 'foo \'bar\' \'car\'',
+	 'dz': "\"'dz'\"",
 	}; 
 match: {
 	'hello' : 42

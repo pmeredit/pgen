@@ -3,6 +3,25 @@ use ast::{Expr, Opcode, Let, Cond, Switch};
 
 grammar;
 
+
+match {
+    //no idea why this regexp won't work
+    //r#"('([^'\\]|\\.)*')|("([^"\\]|\\.)*")"# => STRING,
+    r#"'([^'\\]|\\.)*'"#                       => SINGLESTRING,
+    r#""([^"\\]|\\.)*""#  	               => DOUBLESTRING,
+    r"-?[0-9]+"                                => INT,
+    r"-?([0-9]*[.][0-9]+)"                     => FLOAT,
+    r"\$\w+"                                   => COLUMN,
+    r"[a-zA-Z_]\w*"                            => VARIABLE,
+    "let","=", "in", 
+    "if", "then", "else",
+    "switch", "=>", "default",
+    "{","}","[","]", "(", ")",
+    "+","-","*","/",":",";",",",
+    "<=", ">=", "==", "!=",
+    "and", "or", "null", "true", "false"
+}
+
 pub Pipeline = List<PipelineItem, ";">;
 
 pub TopExpr: Box<Expr> =  { 
@@ -109,28 +128,28 @@ Array: Vec<Box<Expr>> = {
    "[" <Args> "]", 
 };
 
-Str: String = {
-   // '\'' panics lalrpop, so we have to use \u{0027} for a single quote
-   r"'([^'\\]|\\.)*'" => String::from(&<>[1..<>.len()-1])
-};
-
 Bool: bool = {
    "true" => true,
    "false" => false,
 };
 
+Str: String = {
+     SINGLESTRING => String::from(&<>[1..<>.len()-1]),
+     DOUBLESTRING => String::from(&<>[1..<>.len()-1]),
+};
+
 Number: i64 = {
-    r"-?[0-9]+" => i64::from_str(<>).unwrap()
+     INT => i64::from_str(<>).unwrap(),
 };
 
 Float: f64 = {
-    r"-?([0-9]*[.][0-9]+)" => f64::from_str(<>).unwrap()
+     FLOAT => f64::from_str(<>).unwrap(),
 };
 
 Col: String = {
-    r"\$\w+" => String::from(<>)
+     COLUMN => String::from(<>),
 };
 
 ID: String = {
-    r"[a-zA-Z_]\w*" => String::from(<>)
+     VARIABLE => String::from(<>),
 };
