@@ -12,7 +12,7 @@ match {
     r"-?[0-9]+"                                => INT,
     r"-?([0-9]*[.][0-9]+)"                     => FLOAT,
     r"\$\w+"                                   => COLUMN,
-    r"[a-zA-Z_]\w*"                            => VARIABLE,
+    r"[a-zA-Z_]\w*"                            => IDENTIFIER,
     "let","=", "in", 
     "if", "then", "else",
     "switch", "=>", "default",
@@ -151,5 +151,5 @@ Col: String = {
 };
 
 ID: String = {
-     VARIABLE => String::from(<>),
+     IDENTIFIER => String::from(<>),
 };
