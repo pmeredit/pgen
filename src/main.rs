@@ -9,6 +9,9 @@ extern crate indoc;
 #[macro_use]
 extern crate lazy_static;
 
+#[allow(unused_macros)]
+#[macro_use]
+pub mod util;
 pub mod ast;
 pub mod parser;
 pub mod sanity;
