@@ -19,7 +19,7 @@ match {
     "{","}","[","]", "(", ")",
     "+","-","*","/",":",";",",", "**",
     "<=", ">=", "==", "!=",
-    "and", "or", "null", "true", "false"
+    "||", "&&", "null", "true", "false"
 }
 
 pub Pipeline = List<PipelineItem, ";">;
@@ -83,11 +83,11 @@ MulExpr     = Tier<MulOp,     ExpExpr     >;
 ExpExpr     = Tier<ExpOp,     BottomExpr  >;
 
 OrOp: Opcode = {
-    "or" => Opcode::Or,
+    "||" => Opcode::Or,
 };
 
 AndOp: Opcode = {
-    "and" => Opcode::And,
+    "&&"  => Opcode::And,
 };
 
 CompareOp: Opcode = {
