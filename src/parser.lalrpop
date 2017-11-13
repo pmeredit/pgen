@@ -1,5 +1,5 @@
 use std::str::FromStr;
-use ast::{Expr, Opcode, Let, Cond, Switch};
+use ast::*;
 
 grammar;
 
@@ -22,7 +22,9 @@ match {
     "||", "&&", "null", "true", "false"
 }
 
-pub Pipeline = List<PipelineItem, ";">;
+pub Pipeline: Pipeline = PipelineItemList => Pipeline{stages: <>};
+
+PipelineItemList = List<PipelineItem, ";">;
 
 pub TopExpr: Box<Expr> =  { 
     "let" <a:Assignments> "in" <e:TopExpr> => 
@@ -37,8 +39,8 @@ pub TopExpr: Box<Expr> =  {
     OrExpr,
 };
 
-PipelineItem: (String, Box<Expr>) = {
-    <id:ID> ":" <o:TopExpr> => (id, o)
+PipelineItem: PipelineItem = {
+    <id:ID> ":" <o:TopExpr> => PipelineItem{stage_name: id, object: o}
 };
 
 

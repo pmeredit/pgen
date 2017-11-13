@@ -15,7 +15,7 @@ extern crate lazy_static;
 pub mod util;
 pub mod ast;
 pub mod parser;
-pub mod sanity;
+pub mod normalize;
 pub mod mongo_functions;
 
 #[test]
@@ -93,7 +93,7 @@ in
 
 }
 
-pub fn process_file(file_name: &str) -> Option<Vec<(String, Box<ast::Expr>)>> {
+pub fn process_file(file_name: &str) -> Option<ast::Pipeline> {
     use std::fs::File;
     use std::io::prelude::*;
     use regex::Regex;
@@ -133,9 +133,9 @@ fn main() {
             println!("Please pass a file to parse")
         }
         else {
-            let ast = process_file(&args[1]);
-            if let Some(ast) = ast {
-                println!("Ast:\n{:?}", ast);
+            let pipeline = process_file(&args[1]);
+            if let Some(pipeline) = pipeline {
+                println!("Pipeline:\n{:?}", pipeline);
             }
         }
 }
