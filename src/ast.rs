@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Formatter, Error};
+use std::collections::HashSet;
 
 pub enum Expr {
     Number(i64),
@@ -16,6 +17,65 @@ pub enum Expr {
     Array(Vec<Box<Expr>>),
     Object(Vec<(String, Box<Expr>)>),
     Error,
+}
+
+impl Expr {
+    //TODO: likely someday we will want to replace String with 
+    //a reference equal pointer "atom"
+    pub fn free_variables(&self) -> HashSet<String> {
+        use self::Expr::*;
+        let mut ret = HashSet::new();
+        fn aux(e: &Expr, mut ret: &mut HashSet<String>) {
+            match *e {
+                ID(ref s) => {
+                    ret.insert(s.clone());
+                }
+                Op(ref e1, _, ref e2) => { 
+                    aux(&*e1, &mut ret); 
+                    aux(&*e2, &mut ret); 
+                },
+                Cond(ref c) => { 
+                    aux(&*c.cond,      &mut ret); 
+                    aux(&*c.then,      &mut ret); 
+                    aux(&*c.otherwise, &mut ret);
+                },
+                Switch(ref sw) => { 
+                    aux(&*sw.default, &mut ret);
+                    for &(ref cond, ref expr) in &sw.cases {
+                        aux(&*cond, &mut ret);
+                        aux(&*expr, &mut ret);
+                    }
+                },
+                Let(ref l) => {
+                    aux(&*l.expr, &mut ret);
+                    for &(_, ref expr) in &l.assignments {
+                        aux(&*expr, &mut ret);
+                    }
+                    for &(ref s, _) in &l.assignments {
+                        ret.remove(s);
+                    }
+                },
+                App(_, ref args) => {
+                    for ref e in args {
+                        aux(&*e, &mut ret)
+                    }
+                },
+                Array(ref exprs) => {
+                    for ref e in exprs {
+                        aux(&*e, &mut ret)
+                    }
+                },
+                Object(ref pairs) => {
+                    for &(_, ref e) in pairs {
+                        aux(&*e, &mut ret)
+                    }
+                },
+                _ => (),
+            }
+        }
+        aux(self, &mut ret);
+        ret
+    }
 }
 
 pub struct Let {
