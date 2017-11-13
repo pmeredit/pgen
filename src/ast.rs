@@ -46,6 +46,7 @@ pub enum Opcode {
     Gte,
     And,
     Or,
+    Exp,
 }
 
 impl Debug for Let {
@@ -97,6 +98,7 @@ impl Debug for Opcode {
     fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
         use self::Opcode::*;
         match *self {
+            Exp => write!(fmt, "**"),
             Mul => write!(fmt, "*"),
             Div => write!(fmt, "/"),
             Add => write!(fmt, "+"),

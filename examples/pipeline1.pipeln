@@ -5,6 +5,7 @@ project: {
 		 ) + 23,
          'z': 'foo \'bar\' \'car\'',
 	 'dz': "\"'dz'\"",
+	 "q" : foo(3,4) ** foo(4,6),
 	}; 
 match: {
 	'hello' : 42

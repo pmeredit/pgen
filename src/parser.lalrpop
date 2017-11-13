@@ -17,7 +17,7 @@ match {
     "if", "then", "else",
     "switch", "=>", "default",
     "{","}","[","]", "(", ")",
-    "+","-","*","/",":",";",",",
+    "+","-","*","/",":",";",",", "**",
     "<=", ">=", "==", "!=",
     "and", "or", "null", "true", "false"
 }
@@ -79,7 +79,8 @@ OrExpr      = Tier<OrOp,      AndExpr     >;
 AndExpr     = Tier<AndOp,     CompareExpr >;
 CompareExpr = Tier<CompareOp, AddExpr     >;
 AddExpr     = Tier<AddOp,     MulExpr     >;
-MulExpr     = Tier<MulOp,     BottomExpr  >;
+MulExpr     = Tier<MulOp,     ExpExpr     >;
+ExpExpr     = Tier<ExpOp,     BottomExpr  >;
 
 OrOp: Opcode = {
     "or" => Opcode::Or,
@@ -104,6 +105,10 @@ AddOp: Opcode = {
 MulOp: Opcode = {
     "*" => Opcode::Mul,
     "/" => Opcode::Div,
+};
+
+ExpOp: Opcode = {
+    "**" => Opcode::Exp,
 };
 
 BottomExpr: Box<Expr> = {
