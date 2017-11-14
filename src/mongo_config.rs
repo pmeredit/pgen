@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashSet, HashMap};
 
 // TODO?: Add function replacements for things we don't currently have in
 // server??
@@ -23,6 +23,31 @@ pub struct MongoFuncInfo {
 
 // TODO: $meta
 lazy_static! {
+    pub static ref STAGES: HashSet<&'static str> =
+        set![
+            "collStats",
+            "project",
+            "match",
+            "redact",
+            "limit",
+            "skip",
+            "unwind",
+            "group",
+            "sample",
+            "sort",
+            "geoNear",
+            "lookup",
+            "out",
+            "indexStats",
+            "facet",
+            "bucket",
+            "bucketAuto",
+            "sortByCount",
+            "addFields",
+            "replaceRoot",
+            "count",
+            "graphLookup"
+        ];
     pub static ref FUNCTIONS: HashMap<&'static str, MongoFuncInfo> =
         map![
              //special functions argument must be an object
