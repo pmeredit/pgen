@@ -110,9 +110,39 @@ impl Expr {
         aux(self, &mut ret);
         ret
     }
+
+    pub fn variant(&self) -> &'static str {
+        use self::Expr::*;
+        match *self {
+            ID(_)     => "Identifier",
+            Op(_,_,_) => "Binary Operation",
+            Cond(_)   => "If Expression",
+            Switch(_) => "Switch", 
+            Let(_)    => "Let Statement",
+            App(_,_)  => "Function Application",
+            Array(_)  => "Array",
+            Object(_) => "Object",
+            Number(_) => "Int",
+            Float(_)  => "Float",
+            Bool(_)   => "Bool",
+            Null      => "Null",
+            Str(_)    => "String",
+            Col(_)    => "Column Reference",
+            //Should never happen
+            Error     => "Error",
+        }
+    }
+
+    pub fn get_op(&self) -> Option<Opcode> {
+        use self::Expr::*;
+        match *self {
+            Op(_,op,_) => Some(op),
+            _          => None
+        }
+    }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Opcode {
     Mul,
     Div,
@@ -125,4 +155,36 @@ pub enum Opcode {
     And,
     Or,
     Exp,
+}
+
+impl Opcode {
+    // Lower an opcode to the mongo agg function name
+    pub fn to_func_str(&self) -> &'static str {
+        use self::Opcode::*;
+        match *self {
+            Mul => "multiply",
+            Div => "divide",
+            Add => "add",
+            Sub => "subtract",
+            Eq  => "eq",
+            Neq => "ne",
+            Lte => "lte",
+            Gte => "gte",
+            And => "and",
+            Or  => "or",
+            Exp => "pow",
+        }
+    }
+
+    pub fn to_func(&self) -> String {
+        String::from(self.to_func_str())
+    }
+
+    pub fn is_assoc(&self) -> bool {
+        use self::Opcode::*;
+        match *self {
+            Mul | Add | And | Or => true,
+            _ => false
+        }
+    }
 }

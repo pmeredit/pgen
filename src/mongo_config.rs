@@ -10,6 +10,9 @@ pub enum Arity {
     Variadic(u32),
     // Optional arguments, u32, u32 = min, max
     Optional(u32, u32),
+    // Match has different number of arguments in the context of match
+    // second number is outside of match
+    Match(u32, u32),
 }
 
 // This will be any meta info for a function that we want to check
@@ -21,12 +24,15 @@ pub struct MongoFuncInfo {
 }
 
 
+// TODO: match isn't fully supported
+
 // TODO: $meta
 lazy_static! {
     pub static ref STAGES: HashSet<&'static str> =
         set![
             "collStats",
             "project",
+            //match is currently wonky
             "match",
             "redact",
             "limit",
@@ -68,6 +74,16 @@ lazy_static! {
              "last"            => MongoFuncInfo{arity: Arity::Fixed(1)},
              "push"            => MongoFuncInfo{arity: Arity::Fixed(1)},
              "addToSet"        => MongoFuncInfo{arity: Arity::Fixed(1)},
+             //acts differently in match, for now just encoded as optional
+             //eventually we should make this match sensitive
+             "eq"              => MongoFuncInfo{arity: Arity::Match(1,2)},
+             "ne"              => MongoFuncInfo{arity: Arity::Match(1,2)},
+             "gt"              => MongoFuncInfo{arity: Arity::Match(1,2)},
+             "gte"             => MongoFuncInfo{arity: Arity::Match(1,2)},
+             "lt"              => MongoFuncInfo{arity: Arity::Match(1,2)},
+             "lte"             => MongoFuncInfo{arity: Arity::Match(1,2)},
+             "in"              => MongoFuncInfo{arity: Arity::Match(1,2)},
+             "nin"             => MongoFuncInfo{arity: Arity::Match(1,2)},
              //normal functions
              "not"             => MongoFuncInfo{arity: Arity::Fixed(1)},
              "and"             => MongoFuncInfo{arity: Arity::Variadic(1)},
@@ -80,12 +96,6 @@ lazy_static! {
              "anyElementTrue"  => MongoFuncInfo{arity: Arity::Fixed(1)},
              "allElementsTrue" => MongoFuncInfo{arity: Arity::Fixed(1)},
              "cmp"             => MongoFuncInfo{arity: Arity::Fixed(2)},
-             "eq"              => MongoFuncInfo{arity: Arity::Fixed(2)},
-             "gt"              => MongoFuncInfo{arity: Arity::Fixed(2)},
-             "gte"             => MongoFuncInfo{arity: Arity::Fixed(2)},
-             "lt"              => MongoFuncInfo{arity: Arity::Fixed(2)},
-             "lte"             => MongoFuncInfo{arity: Arity::Fixed(2)},
-             "ne"              => MongoFuncInfo{arity: Arity::Fixed(2)},
              "abs"             => MongoFuncInfo{arity: Arity::Fixed(1)},
              "add"             => MongoFuncInfo{arity: Arity::Variadic(2)},
              "ceil"            => MongoFuncInfo{arity: Arity::Fixed(1)},
@@ -116,7 +126,6 @@ lazy_static! {
              "arrayElementAt"  => MongoFuncInfo{arity: Arity::Fixed(2)},
              "arrayToObject"   => MongoFuncInfo{arity: Arity::Fixed(1)},
              "concatArrays"    => MongoFuncInfo{arity: Arity::Variadic(2)},
-             "in"              => MongoFuncInfo{arity: Arity::Fixed(2)},
              "indexOfArray"    => MongoFuncInfo{arity: Arity::Optional(2,4)},
              "isArray"         => MongoFuncInfo{arity: Arity::Fixed(1)},
              "objectToArray"   => MongoFuncInfo{arity: Arity::Fixed(1)},
