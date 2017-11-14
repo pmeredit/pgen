@@ -12,3 +12,11 @@ lalrpop-util = "0.13.1"
 regex = "0.2.1"
 indoc = "0.2"
 lazy_static = "0.2"
+
+[lib]
+name = "pgen"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pgen"
+path = "src/main.rs"
