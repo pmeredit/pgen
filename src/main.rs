@@ -3,8 +3,6 @@ extern crate pgen;
 #[cfg(not(test))]
 fn main() {
         use std::env;
-        use std::fs::File;
-        use std::io::prelude::*;
         use pgen::normalize::Normalize;
 
         let args: Vec<_> = env::args().collect();

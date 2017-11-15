@@ -11,30 +11,31 @@ pub trait Normalize {
 impl Normalize for Expr {
     fn normalize(self) -> Result<Box<Self>, String> {
         use self::Expr::*;
+        use mongo_config::Arity::*;
         match self {
             Op(e1, op, e2) => {
-                                  if op.is_assoc() {
-                                      let (left_op, right_op)  = (e1.get_op(),     e2.get_op());
-                                      let (left, right)        = (e1.normalize()?, e2.normalize()?);
-                                      let mut args = Vec::new();
-                                      if left_op == Some(op) {
-                                          let left_args = left.take_args();
-                                          args.extend(left_args.into_iter());
-                                      } else {
-                                          args.push(left);
-                                      }
-                                      if right_op == Some(op) {
-                                          let right_args = right.take_args();
-                                          args.extend(right_args.into_iter());
-                                      } else {
-                                          args.push(right);
-                                      }
-                                      Ok(Box::new(App(op.to_func(), args)))
-                                  }
-                                  else {
-                                      let (left, right) = (e1.normalize()?, e2.normalize()?);
-                                      Ok(Box::new(App(op.to_func(), vec![left,right])))
-                                  }
+                                if op.is_assoc() {
+                                    let (left_op, right_op)  = (e1.get_op(),     e2.get_op());
+                                    let (left, right)        = (e1.normalize()?, e2.normalize()?);
+                                    let mut args = Vec::new();
+                                    if left_op == Some(op) {
+                                        let left_args = left.take_args();
+                                        args.extend(left_args.into_iter());
+                                    } else {
+                                        args.push(left);
+                                    }
+                                    if right_op == Some(op) {
+                                        let right_args = right.take_args();
+                                        args.extend(right_args.into_iter());
+                                    } else {
+                                        args.push(right);
+                                    }
+                                    Ok(Box::new(App(op.to_func(), args)))
+                                }
+                                else {
+                                    let (left, right) = (e1.normalize()?, e2.normalize()?);
+                                    Ok(Box::new(App(op.to_func(), vec![left,right])))
+                                }
                               },
             Cond(c)        => Ok(Box::new(Cond(c.normalize()?))),
             Switch(sw)     => Ok(Box::new(Switch(sw.normalize()?))),
@@ -54,11 +55,25 @@ impl Normalize for Expr {
             App(s, args)   => {
                                 if !FUNCTIONS.contains_key(s.as_str()) {
                                     return Err(format!("'{}' is not a known Mongo function", s));
-                              }
-                              let args: Result<Vec<Box<Expr>>, String> = args.into_iter()
-                                                                             .map(|e| {e.normalize()})
-                                                                             .collect();
-                                Ok(Box::new(App(s, args?)))
+                                }
+                                let args: Result<Vec<Box<Expr>>, String> = args.into_iter()
+                                                                               .map(|e| {e.normalize()})
+                                                                               .collect();
+                                let args     = args?;
+                                let args_len = args.len();
+                                match FUNCTIONS[s.as_str()].arity {
+                                  Fixed(i) => if args_len != i {
+                                                  return Err(format!("'{}' takes exactly {} arguments, but {} provided", s, i, args_len))
+                                              },
+                                  Variadic(i) => if args_len < i {
+                                                  return Err(format!("'{}' takes at least {} arguments, but {} provided", s, i, args_len))
+                                              },
+                                  // Eventually we need to pass down if we are in a match context
+                                  Match(min,max) | Optional(min,max) => if args_len < min || args_len > max {
+                                                  return Err(format!("'{}' takes between {} and {} arguments, but {} provided", s, min, max, args_len))
+                                              },
+                                }
+                                Ok(Box::new(App(s, args)))
                               },
             _ => Ok(Box::new(self)),
         }

@@ -2,23 +2,24 @@ use std::collections::{HashSet, HashMap};
 
 // TODO?: Add function replacements for things we don't currently have in
 // server??
-
+#[derive(Copy, Clone, Debug, PartialEq, Eq)] 
 pub enum Arity {
-    // Fixed arity, u32 = size
-    Fixed(u32),
-    // Variadic arity, u32 = min size
-    Variadic(u32),
-    // Optional arguments, u32, u32 = min, max
-    Optional(u32, u32),
+    // Fixed arity, usize = size
+    Fixed(usize),
+    // Variadic arity, usize = min size
+    Variadic(usize),
+    // Optional arguments, usize, usize = min, max
+    Optional(usize, usize),
     // Match has different number of arguments in the context of match
     // second number is outside of match
-    Match(u32, u32),
+    Match(usize, usize),
 }
 
 // This will be any meta info for a function that we want to check
 // in sanity.rs, currently we only check that the arity matches,
 // eventually we might also do type checking for literals (but it won't
 // save use from field values)
+#[derive(Copy, Clone, Debug, PartialEq, Eq)] 
 pub struct MongoFuncInfo {
     pub arity: Arity,
 }
@@ -103,6 +104,7 @@ lazy_static! {
              "exp"             => MongoFuncInfo{arity: Arity::Fixed(1)},
              "floor"           => MongoFuncInfo{arity: Arity::Fixed(1)},
              "ln"              => MongoFuncInfo{arity: Arity::Fixed(1)},
+             "literal"         => MongoFuncInfo{arity: Arity::Fixed(1)},
              "log"             => MongoFuncInfo{arity: Arity::Fixed(2)},
              "log10"           => MongoFuncInfo{arity: Arity::Fixed(1)},
              "mod"             => MongoFuncInfo{arity: Arity::Fixed(2)},
@@ -133,7 +135,6 @@ lazy_static! {
              "reverseArray"    => MongoFuncInfo{arity: Arity::Fixed(1)},
              "size"            => MongoFuncInfo{arity: Arity::Fixed(1)},
              "slice"           => MongoFuncInfo{arity: Arity::Optional(2,3)},
-             "literal"         => MongoFuncInfo{arity: Arity::Fixed(1)},
              "dayOfYear"       => MongoFuncInfo{arity: Arity::Fixed(1)},
              "dayOfMonth"      => MongoFuncInfo{arity: Arity::Fixed(1)},
              "dayOfWeek"       => MongoFuncInfo{arity: Arity::Fixed(1)},
