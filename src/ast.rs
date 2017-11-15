@@ -36,10 +36,10 @@ pub struct Switch {
 
 #[derive(Debug)]
 pub enum Expr {
+    Null,
     Number(i64),
     Float(f64),
     Bool(bool),
-    Null,
     Str(String),
     ID(String),
     Col(String),

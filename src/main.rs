@@ -1,9 +1,11 @@
 extern crate pgen;
+extern crate serde_json;
 
 #[cfg(not(test))]
 fn main() {
         use std::env;
         use pgen::normalize::Normalize;
+        use pgen::codegen::*;
 
         let args: Vec<_> = env::args().collect();
         if args.len() < 2 {
@@ -15,7 +17,11 @@ fn main() {
                 println!("Pipeline:\n{:?}", pipeline);
 
                 println!("************");
-                println!("Normalized: \n{:?}", pipeline.normalize());
+                let normal = pipeline.normalize().unwrap();
+                println!("Normalized: \n{:?}", normal);
+                println!("************");
+                let json: Option<Box<JsonType>> = normal.convert();
+                println!("Json: \n{}", serde_json::to_string_pretty(&json).unwrap());
             }
         }
 }

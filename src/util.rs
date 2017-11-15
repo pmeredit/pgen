@@ -10,7 +10,7 @@ macro_rules! set {
     };
 }
 
-macro_rules! map {
+macro_rules! hash_map {
      ( $( $x:expr => $y:expr ),* ) => {
         {
             let mut temp_map = HashMap::new();
@@ -20,4 +20,20 @@ macro_rules! map {
             temp_map
         }
     };
+}
+
+macro_rules! linked_hash_map {
+     ( $( $x:expr => $y:expr ),* ) => {
+        {
+            let mut temp_map = LinkedHashMap::new();
+            $(
+                temp_map.insert($x, $y);
+            )*
+            temp_map
+        }
+    };
+}
+
+macro_rules! obox {
+    ( $x:expr ) => { Some(Box::new($x)) }
 }

@@ -1,6 +1,5 @@
 project: {
 	'x':true, 
-	// This expression contains free variables, which is an error
 	'y': 3 + (let z = $y, x = $x 
 		   in and(z,x,3.4,-23,[1,2,3,4])
 		 ) + 23,

@@ -1,19 +1,31 @@
 extern crate regex;
 extern crate lalrpop_util;
 
+#[macro_use]
+extern crate serde_derive;
+
+extern crate serde;
+extern crate serde_json;
+
 //This only applies to one import.  We do not want to warn
 //on indoc just every time we aren't running tests
 #[allow(unused_imports)]
 #[macro_use]
 extern crate indoc;
 
+#[macro_use(bson, doc)]
+extern crate bson;
+
 #[macro_use]
 extern crate lazy_static;
+
+extern crate linked_hash_map;
 
 #[allow(unused_macros)]
 #[macro_use]
 pub mod util;
 pub mod ast;
+pub mod codegen;
 pub mod parser;
 pub mod normalize;
 pub mod mongo_config;

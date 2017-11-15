@@ -56,7 +56,7 @@ lazy_static! {
             "graphLookup"
         ];
     pub static ref FUNCTIONS: HashMap<&'static str, MongoFuncInfo> =
-        map![
+        hash_map![
              //special functions argument must be an object
              "map"             => MongoFuncInfo{arity: Arity::Fixed(1)},
              "reduce"          => MongoFuncInfo{arity: Arity::Fixed(1)},
