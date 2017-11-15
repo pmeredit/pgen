@@ -18,14 +18,14 @@ impl Normalize for Expr {
                                       let (left, right)        = (e1.normalize()?, e2.normalize()?);
                                       let mut args = Vec::new();
                                       if left_op == Some(op) {
-                                          let left = match *left { App(_, args) => args, _ => return Err(String::from("Unreachable")) };
-                                          args.extend(left.into_iter());
+                                          let left_args = left.take_args();
+                                          args.extend(left_args.into_iter());
                                       } else {
                                           args.push(left);
                                       }
                                       if right_op == Some(op) {
-                                          let right = match *right { App(_, args) => args, _ => return Err(String::from("Unreachable")) };
-                                          args.extend(right.into_iter());
+                                          let right_args = right.take_args();
+                                          args.extend(right_args.into_iter());
                                       } else {
                                           args.push(right);
                                       }

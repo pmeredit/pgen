@@ -140,6 +140,13 @@ impl Expr {
             _          => None
         }
     }
+
+    pub fn take_args(self) -> Vec<Box<Expr>> {
+        match self {
+            self::Expr::App(_, args) => args,
+            _                        => Vec::new(),
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
