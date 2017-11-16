@@ -11,4 +11,12 @@ project: {
 		) 
            start with 42 
 	   using value * this
-	  }
+	  };
+group: {
+      '_id': $x,
+      // We need to ensure that there is a accumlator function at the top level
+      // for non-'_id' fields.  Currently, we do not enforce that, and we don't
+      // fail until we send it to the server
+      'sum': sum(11 * $x),
+      'foo': avg(23 * $x % 10),
+}

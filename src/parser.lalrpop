@@ -21,7 +21,7 @@ match {
     "{","}","[","]", "(", ")",
     "+", "-", "*", "/", "%", ":", ";", ",", "**",
     "<", ">", "<=", ">=", "==", "!=",
-    "||", "&&", "null", "true", "false"
+    "||", "++", "@", "&&", "null", "true", "false"
 }
 
 pub Pipeline: Pipeline = PipelineItemList => Pipeline{stages: <>};

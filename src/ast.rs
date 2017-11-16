@@ -5,6 +5,14 @@ pub struct Pipeline {
     pub stages: Vec<PipelineItem>,
 }
 
+// TODO: add enum for PipelineItem so that we can
+// define non-standard items like match where we need a different
+// type of conversion to json/bson
+//
+// In normalize we can promote any PipelineItems for such non-standards
+//
+// Also need to figure out a way to eventually support expressive lookup
+
 #[derive(Debug)]
 pub struct PipelineItem {
     pub stage_name: String,
