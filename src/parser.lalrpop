@@ -14,12 +14,12 @@ match {
     r"\$\w+"                                   => COLUMN,
     r"[a-zA-Z_]\w*"                            => IDENTIFIER,
     "let","=", "in", "filter", "map",
-    "zip", "reduce", "as", "where",
+    "zip", "defaults", "reduce", "as", "where",
     "if", "then", "else",
     "switch", "=>", "default",
     "{","}","[","]", "(", ")",
     "+", "-", "*", "/", "%", ":", ";", ",", "**",
-    "<=", ">=", "==", "!=",
+    "<", ">", "<=", ">=", "==", "!=",
     "||", "&&", "null", "true", "false"
 }
 
@@ -37,6 +37,9 @@ pub TopExpr: Box<Expr> =  {
     "filter" <i:OrExpr> <id:OptionalAs> "where" <c:TopExpr> =>
         Box::new(Expr::Filter(
 	    Box::new(Filter{input: i, ename: id, cond: c}))),
+    "zip" <i:ArrayExpr> <d:OptionalDefault> =>
+        Box::new(Expr::Zip(
+	    Box::new(Zip{inputs: i, longest: match d { None => false, _=> true }, defaults: d}))),
     "if" <i:OrExpr> "then" <t:OrExpr> "else" <e:OrExpr> =>
      	Box::new(Expr::Cond(
 	    Box::new(Cond{cond:i, then:t, otherwise:e}))),
@@ -49,6 +52,11 @@ pub TopExpr: Box<Expr> =  {
 OptionalAs: String = {
     ()           => "this".to_string(),
     "as" <id:ID> => id,
+};
+
+OptionalDefault: Option<Box<Expr>> = {
+    ()                        => None,
+    "defaults" <d:ArrayExpr>  => Some(d),
 };
 
 PipelineItem: PipelineItem = {
@@ -109,6 +117,8 @@ CompareOp: Opcode = {
     "!=" => Opcode::Neq,
     "<=" => Opcode::Lte,
     ">=" => Opcode::Gte,
+    "<"  => Opcode::Lt,
+    ">"  => Opcode::Gt,
 };
 
 AddOp: Opcode = { 
@@ -134,14 +144,18 @@ BottomExpr: Box<Expr> = {
     Float  => Box::new(Expr::Float(<>)),
     ID     => Box::new(Expr::ID(<>)),
     Col    => Box::new(Expr::Col(<>)),
-    Array  => Box::new(Expr::Array(<>)),
     Object => Box::new(Expr::Object(<>)),
     <id:ID> "(" <args:Args> ")" => Box::new(Expr::App(id, args)),
+    ArrayExpr,
     "(" <TopExpr> ")",
 };
 
 Object: Vec<(String, Box<Expr>)> = {
    "{" <ObjItems> "}",
+};
+
+ArrayExpr: Box<Expr> = {
+   Array => Box::new(Expr::Array(<>)),
 };
 
 Array: Vec<Box<Expr>> = {

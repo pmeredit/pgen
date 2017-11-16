@@ -42,6 +42,7 @@ impl Normalize for Expr {
             Let(l)         => Ok(Box::new(Let(l.normalize()?))),
             Map(m)         => Ok(Box::new(Map(m.normalize()?))),
             Filter(f)      => Ok(Box::new(Filter(f.normalize()?))),
+            Zip(z)         => Ok(Box::new(Zip(z.normalize()?))),
             Object(o)      => {
                                 let o: Result<Vec<(String, Box<Expr>)>, String> = o.into_iter()
                                                                                    .map(|(k,v)| {Ok((k, v.normalize()?))})
@@ -130,7 +131,7 @@ impl Normalize for Map {
     fn normalize(self) -> Result<Box<Self>, String> {
         Ok(Box::new(Map{input: self.input.normalize()?,
                         ename: self.ename,
-                        expr: self.expr.normalize()?}))
+                        expr:  self.expr.normalize()?}))
     }
 }
 
@@ -138,7 +139,39 @@ impl Normalize for Filter {
     fn normalize(self) -> Result<Box<Self>, String> {
         Ok(Box::new(Filter{input: self.input.normalize()?,
                            ename: self.ename,
-                           cond: self.cond.normalize()?}))
+                           cond:  self.cond.normalize()?}))
+    }
+}
+
+impl Normalize for Zip {
+    fn normalize(self) -> Result<Box<Self>, String> {
+        let inputs   = self.inputs.normalize()?;
+        let defaults = match self.defaults {
+            None    => None,
+            Some(d) => Some(d.normalize()?)
+        };
+        match *inputs {
+            Expr::Array(ref v) => {
+                let vlen = v.len();
+                match defaults {
+                    None => (),
+                    Some(ref d) => {
+                        match d.as_ref() {
+                            &Expr::Array(ref a) => {
+                                if v.len() != a.len() {
+                                    return Err(format!("Inputs and defaults for zip must have same size, sizes are {} and {} respectively", v.len(), a.len()))
+                                }
+                            },
+                            _ => return Err(format!("Defaults for zip must be an array, not {:?}", defaults))
+                        }
+                    }
+                }
+            },
+            _ => return Err(format!("Inputs to zip must be an array, not {}", inputs.variant()))
+        };
+        Ok(Box::new(Zip{inputs,
+                        longest: self.longest,
+                        defaults }))
     }
 }
 

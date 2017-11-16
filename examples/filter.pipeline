@@ -1,7 +1,10 @@
-project: {
-   'x': filter "$y" 
-        as foo
-	where let x=42 
-	   in
-	   foo == 1
-}
+project: { 
+      'x': map (
+                 filter range(1,10) 
+		 as foo 
+		 where 
+	                let x = foo ** 4 in x + 42 < 200
+		) 
+           as x 
+	   in x * 42
+	  }

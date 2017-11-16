@@ -35,6 +35,13 @@ pub struct Filter{
     pub cond:  Box<Expr>,
 }
 
+#[derive(Debug)] 
+pub struct Zip{
+    pub inputs:   Box<Expr>, 
+    pub longest:  bool, 
+    pub defaults: Option<Box<Expr>>,
+}
+
 #[derive(Debug)]
 pub struct Cond {
     pub cond: Box<Expr>,
@@ -63,6 +70,7 @@ pub enum Expr {
     Let(Box<Let>),
     Map(Box<Map>),
     Filter(Box<Filter>),
+    Zip(Box<Zip>),
     App(String, Vec<Box<Expr>>),
     Array(Vec<Box<Expr>>),
     Object(Vec<(String, Box<Expr>)>),
@@ -118,6 +126,13 @@ impl Expr {
                     // Remove assigned name from free vars
                     ret.remove(&f.ename);
                 }
+                Zip(ref z) => {
+                    aux(&*z.inputs,   &mut ret);
+                    match z.defaults.as_ref() {
+                        Some(ref d) => aux(d, &mut ret),
+                        None        => ()
+                    };
+                }
                 App(_, ref args) => {
                     for ref e in args {
                         aux(&*e, &mut ret)
@@ -150,6 +165,7 @@ impl Expr {
             Let(_)    => "Let Expression",
             Map(_)    => "Map Expression",
             Filter(_) => "Filter Expression",
+            Zip(_) => "Zip Expression",
             App(_,_)  => "Function Application",
             Array(_)  => "Array",
             Object(_) => "Object",
@@ -191,6 +207,8 @@ pub enum Opcode {
     Neq,
     Lte,
     Gte,
+    Lt,
+    Gt,
     And,
     Or,
     Exp,
@@ -210,6 +228,8 @@ impl Opcode {
             Neq => "ne",
             Lte => "lte",
             Gte => "gte",
+            Lt  => "lt",
+            Gt  => "gt",
             And => "and",
             Or  => "or",
             Exp => "pow",

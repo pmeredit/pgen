@@ -17,13 +17,18 @@ fn main() {
                 println!("Pipeline:\n{:?}", pipeline);
 
                 println!("************");
-                let normal = pipeline.normalize().unwrap();
-                println!("Normalized: \n{:?}", normal);
-                println!("************");
-                let json: Option<Box<JsonType>> = normal.convert();
-                println!("Json: \n{}", serde_json::to_string_pretty(&json).unwrap());
-                println!("************");
-                println!("Json: \n{}", serde_json::to_string(&json).unwrap());
+                let normal = pipeline.normalize();
+                match normal {
+                     Ok(normal)  => {
+                         println!("Normalized: \n{:?}", normal);
+                         println!("************");
+                         let json: Option<Box<JsonType>> = normal.convert();
+                         println!("Json: \n{}", serde_json::to_string_pretty(&json).unwrap());
+                         println!("************");
+                         println!("Json: \n{}", serde_json::to_string(&json).unwrap());
+                     }
+                     Err(e) => println!("{}", e)
+                }
             }
         }
 }

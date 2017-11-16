@@ -35,6 +35,7 @@ impl Convert<Option<Box<JsonType>>> for Expr {
               Expr::Let(l)        => l.convert(),
               Expr::Map(m)        => m.convert(),
               Expr::Filter(f)     => f.convert(),
+              Expr::Zip(z)        => z.convert(),
               Expr::App(s,args)   => {
                  obox!(O(linked_hash_map![
                                             "$".to_string() + &s => 
@@ -228,9 +229,9 @@ impl Convert<Option<Box<JsonType>>> for Map {
 //  {
 //     "$filter":
 //       {
-//         "input": cond,
+//         "input": expr,
 //         "as"   : string,
-//         "in"   : cond
+//         "cond" : expr
 //       }
 //  }
 //
@@ -249,6 +250,42 @@ impl Convert<Option<Box<JsonType>>> for Filter {
                              "cond".to_string()  => cond
                                        ]
                           ))
+                ]
+                ))
+    }
+}
+
+//  {
+//     "$zip":
+//       {
+//         "inputs"             : arrayExp,
+//         "useLongestLength"   : bool,
+//         "defaults"           : arrayExp
+//       }
+//  }
+//
+impl Convert<Option<Box<JsonType>>> for Zip {
+    fn convert(self) -> Option<Box<JsonType>> {
+        use self::JsonType::*;
+        let inputs: Option<Box<JsonType>>   = self.inputs.convert();
+        let longest                         = obox!(B(self.longest));
+        let defaults: Option<Box<JsonType>> = self.defaults.convert();
+        obox!(O(
+            linked_hash_map![
+                "$zip".to_string() => 
+                     if self.longest {
+                         obox!(O(linked_hash_map![
+                                 "inputs".to_string()   => inputs,
+                                 "useLongestLength".to_string()  => longest,
+                                 "defaults".to_string() => defaults
+                                 ]
+                              ))
+                     } else {
+                         obox!(O(linked_hash_map![
+                                 "inputs".to_string()   => inputs
+                                 ]
+                              ))
+                     }
                 ]
                 ))
     }
