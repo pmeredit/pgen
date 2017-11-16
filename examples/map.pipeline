@@ -1,11 +1,9 @@
 project: {
    // Should add actual translations for filter, map, zip, and reduce
    // since they introduce variables.  Should never need to see $$
-   'x': map({
-                  'input': ['a','b','c'],
-		  'as': 'num',
-		  'in' : if '$$num' == 'a' || '$$num' == 'b'
-		         then 'c'
-			 else 'foo'
-	    })
+   'x': map "$y" 
+        as foo
+	in let x=42 
+	   in
+	   (foo % 3) ** 4 + "$z" + x
 }

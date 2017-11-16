@@ -21,6 +21,13 @@ pub struct Let {
     pub expr: Box<Expr>,
 }
 
+#[derive(Debug)] 
+pub struct Map{
+    pub input: Box<Expr>, 
+    pub ename: String, 
+    pub expr:  Box<Expr>,
+}
+
 #[derive(Debug)]
 pub struct Cond {
     pub cond: Box<Expr>,
@@ -47,6 +54,7 @@ pub enum Expr {
     Cond(Box<Cond>),
     Switch(Box<Switch>),
     Let(Box<Let>),
+    Map(Box<Map>),
     App(String, Vec<Box<Expr>>),
     Array(Vec<Box<Expr>>),
     Object(Vec<(String, Box<Expr>)>),
@@ -85,10 +93,17 @@ impl Expr {
                     for &(_, ref expr) in &l.assignments {
                         aux(&*expr, &mut ret);
                     }
+                    // Remove any assigned variables from free vars
                     for &(ref s, _) in &l.assignments {
                         ret.remove(s);
                     }
                 },
+                Map(ref m) => {
+                    aux(&*m.input, &mut ret);
+                    aux(&*m.expr,  &mut ret);
+                    // Remove assigned name from free vars
+                    ret.remove(&m.ename);
+                }
                 App(_, ref args) => {
                     for ref e in args {
                         aux(&*e, &mut ret)
@@ -118,7 +133,8 @@ impl Expr {
             Op(_,_,_) => "Binary Operation",
             Cond(_)   => "If Expression",
             Switch(_) => "Switch", 
-            Let(_)    => "Let Statement",
+            Let(_)    => "Let Expression",
+            Map(_)    => "Map Expression",
             App(_,_)  => "Function Application",
             Array(_)  => "Array",
             Object(_) => "Object",
@@ -153,6 +169,7 @@ impl Expr {
 pub enum Opcode {
     Mul,
     Div,
+    Mod,
     Add,
     Sub,
     Eq,
@@ -171,6 +188,7 @@ impl Opcode {
         match *self {
             Mul => "multiply",
             Div => "divide",
+            Mod => "mod",
             Add => "add",
             Sub => "subtract",
             Eq  => "eq",

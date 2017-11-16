@@ -40,6 +40,7 @@ impl Normalize for Expr {
             Cond(c)        => Ok(Box::new(Cond(c.normalize()?))),
             Switch(sw)     => Ok(Box::new(Switch(sw.normalize()?))),
             Let(l)         => Ok(Box::new(Let(l.normalize()?))),
+            Map(m)         => Ok(Box::new(Map(m.normalize()?))),
             Object(o)      => {
                                 let o: Result<Vec<(String, Box<Expr>)>, String> = o.into_iter()
                                                                                    .map(|(k,v)| {Ok((k, v.normalize()?))})
@@ -120,6 +121,14 @@ impl Normalize for Let {
             assignments.push((s, e.normalize()?));
         }
         Ok(Box::new(Let{assignments: assignments,
+                        expr: self.expr.normalize()?}))
+    }
+}
+
+impl Normalize for Map {
+    fn normalize(self) -> Result<Box<Self>, String> {
+        Ok(Box::new(Map{input: self.input.normalize()?,
+                        ename: self.ename,
                         expr: self.expr.normalize()?}))
     }
 }

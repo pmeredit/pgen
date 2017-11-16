@@ -33,6 +33,7 @@ impl Convert<Option<Box<JsonType>>> for Expr {
               Expr::Cond(c)       => c.convert(),
               Expr::Switch(sw )   => sw.convert(),
               Expr::Let(l)        => l.convert(),
+              Expr::Map(m)        => m.convert(),
               Expr::App(s,args)   => {
                  obox!(O(linked_hash_map![
                                             "$".to_string() + &s => 
@@ -190,5 +191,34 @@ impl Convert<Option<Box<JsonType>>> for Let {
                 ]
                 ))
     }
+}
 
+
+//  {
+//     "$map":
+//       {
+//         "input": expr,
+//         "as"   : string,
+//         "in"   : expr
+//       }
+//  }
+//
+impl Convert<Option<Box<JsonType>>> for Map {
+    fn convert(self) -> Option<Box<JsonType>> {
+        use self::JsonType::*;
+        let input: Option<Box<JsonType>> = self.input.convert();
+        let ename                        = obox!(S(self.ename));
+        let expr:  Option<Box<JsonType>> = self.expr.convert();
+        obox!(O(
+            linked_hash_map![
+                "$map".to_string() => 
+                     obox!(O(linked_hash_map![
+                             "input".to_string() => input,
+                             "as".to_string()    => ename,
+                             "in".to_string()    => expr
+                                       ]
+                          ))
+                ]
+                ))
+    }
 }
