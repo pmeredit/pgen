@@ -1,7 +1,7 @@
 project: { 
       'x': reduce (
                  filter (
-		          map range(1,10) @ [-42,-43,44,$z]
+		          map range(1,10) ... range(-20,0,-2) ... [$z]
 			  as  x
 			  using x ** 3 + $z
 			 )
@@ -13,7 +13,7 @@ project: {
 	   using value * this
 	  };
 group: {
-      '_id': "hello" ++ "\"world\"",
+      '_id': "hello" ++ "\"world\"" ++ " this is a bad id",
       // We need to ensure that there is a accumlator function at the top level
       // for non-'_id' fields.  Currently, we do not enforce that, and we don't
       // fail until we send it to the server

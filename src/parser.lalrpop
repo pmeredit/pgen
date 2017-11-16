@@ -21,7 +21,7 @@ match {
     "{","}","[","]", "(", ")",
     "+", "-", "*", "/", "%", ":", ";", ",", "**",
     "<", ">", "<=", ">=", "==", "!=",
-    "||", "++", "@", "&&", "null", "true", "false"
+    "||", "++", "...", "&&", "null", "true", "false"
 }
 
 pub Pipeline: Pipeline = PipelineItemList => Pipeline{stages: <>};
@@ -142,9 +142,9 @@ MulOp: Opcode = {
 };
 
 ExpOp: Opcode = {
-    "**" => Opcode::Exp,
-    "++" => Opcode::StrCat,
-    "@"  => Opcode::ArrCat,
+    "**"  => Opcode::Exp,
+    "++"  => Opcode::StrCat,
+    "..." => Opcode::ArrCat,
 };
 
 BottomExpr: Box<Expr> = {

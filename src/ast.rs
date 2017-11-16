@@ -272,7 +272,7 @@ impl Opcode {
     pub fn is_assoc(&self) -> bool {
         use self::Opcode::*;
         match *self {
-            Mul | Add | And | Or => true,
+            Mul | Add | And | Or | StrCat | ArrCat => true,
             _ => false
         }
     }
