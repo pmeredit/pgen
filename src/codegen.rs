@@ -34,6 +34,7 @@ impl Convert<Option<Box<JsonType>>> for Expr {
               Expr::Switch(sw )   => sw.convert(),
               Expr::Let(l)        => l.convert(),
               Expr::Map(m)        => m.convert(),
+              Expr::Filter(f)     => f.convert(),
               Expr::App(s,args)   => {
                  obox!(O(linked_hash_map![
                                             "$".to_string() + &s => 
@@ -91,7 +92,7 @@ impl Convert<Option<Box<JsonType>>> for Pipeline {
                                                   .into_iter()
                                                   .map(|PipelineItem{stage_name, object}| {
                                                               obox!(O(
-                                                                      linked_hash_map![stage_name => object.convert()]
+                                                                      linked_hash_map!["$".to_string() + &stage_name => object.convert()]
                                                                       ))
                                                            }
                                                       )
@@ -216,6 +217,36 @@ impl Convert<Option<Box<JsonType>>> for Map {
                              "input".to_string() => input,
                              "as".to_string()    => ename,
                              "in".to_string()    => expr
+                                       ]
+                          ))
+                ]
+                ))
+    }
+}
+
+
+//  {
+//     "$filter":
+//       {
+//         "input": cond,
+//         "as"   : string,
+//         "in"   : cond
+//       }
+//  }
+//
+impl Convert<Option<Box<JsonType>>> for Filter {
+    fn convert(self) -> Option<Box<JsonType>> {
+        use self::JsonType::*;
+        let input: Option<Box<JsonType>> = self.input.convert();
+        let ename                        = obox!(S(self.ename));
+        let cond:  Option<Box<JsonType>> = self.cond.convert();
+        obox!(O(
+            linked_hash_map![
+                "$filter".to_string() => 
+                     obox!(O(linked_hash_map![
+                             "input".to_string() => input,
+                             "as".to_string()    => ename,
+                             "cond".to_string()  => cond
                                        ]
                           ))
                 ]

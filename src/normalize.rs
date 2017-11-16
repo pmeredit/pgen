@@ -133,6 +133,14 @@ impl Normalize for Map {
     }
 }
 
+impl Normalize for Filter {
+    fn normalize(self) -> Result<Box<Self>, String> {
+        Ok(Box::new(Filter{input: self.input.normalize()?,
+                           ename: self.ename,
+                           cond: self.cond.normalize()?}))
+    }
+}
+
 impl Normalize for Cond {
     fn normalize(self) -> Result<Box<Self>, String> {
         Ok(Box::new(Cond{ cond:      self.cond.normalize()?,

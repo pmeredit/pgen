@@ -22,6 +22,8 @@ fn main() {
                 println!("************");
                 let json: Option<Box<JsonType>> = normal.convert();
                 println!("Json: \n{}", serde_json::to_string_pretty(&json).unwrap());
+                println!("************");
+                println!("Json: \n{}", serde_json::to_string(&json).unwrap());
             }
         }
 }

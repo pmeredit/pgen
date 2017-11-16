@@ -28,6 +28,13 @@ pub struct Map{
     pub expr:  Box<Expr>,
 }
 
+#[derive(Debug)] 
+pub struct Filter{
+    pub input: Box<Expr>, 
+    pub ename: String, 
+    pub cond:  Box<Expr>,
+}
+
 #[derive(Debug)]
 pub struct Cond {
     pub cond: Box<Expr>,
@@ -55,6 +62,7 @@ pub enum Expr {
     Switch(Box<Switch>),
     Let(Box<Let>),
     Map(Box<Map>),
+    Filter(Box<Filter>),
     App(String, Vec<Box<Expr>>),
     Array(Vec<Box<Expr>>),
     Object(Vec<(String, Box<Expr>)>),
@@ -104,6 +112,12 @@ impl Expr {
                     // Remove assigned name from free vars
                     ret.remove(&m.ename);
                 }
+                Filter(ref f) => {
+                    aux(&*f.input, &mut ret);
+                    aux(&*f.cond,  &mut ret);
+                    // Remove assigned name from free vars
+                    ret.remove(&f.ename);
+                }
                 App(_, ref args) => {
                     for ref e in args {
                         aux(&*e, &mut ret)
@@ -135,6 +149,7 @@ impl Expr {
             Switch(_) => "Switch", 
             Let(_)    => "Let Expression",
             Map(_)    => "Map Expression",
+            Filter(_) => "Filter Expression",
             App(_,_)  => "Function Application",
             Array(_)  => "Array",
             Object(_) => "Object",
