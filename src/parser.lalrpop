@@ -18,10 +18,10 @@ match {
     "reduce", "start", "with", "using",
     "if", "then", "else",
     "switch", "=>", "default",
-    "{","}","[","]", "(", ")",
+    "{","}","[","]", "[[", "]]", "(", ")",
     "+", "-", "*", "/", "%", ":", ";", ",", "**",
     "<", ">", "<=", ">=", "==", "!=",
-    "||", "++", "...", "&&", "null", "true", "false"
+    "||", "++", "...", "@", "&&", "null", "true", "false"
 }
 
 pub Pipeline: Pipeline = PipelineItemList => Pipeline{stages: <>};
@@ -145,6 +145,7 @@ ExpOp: Opcode = {
     "**"  => Opcode::Exp,
     "++"  => Opcode::StrCat,
     "..." => Opcode::ArrCat,
+    "@"   => Opcode::ArrCat,
 };
 
 BottomExpr: Box<Expr> = {
@@ -157,6 +158,12 @@ BottomExpr: Box<Expr> = {
     Col    => Box::new(Expr::Col(<>)),
     Object => Box::new(Expr::Object(<>)),
     <id:ID> "(" <args:Args> ")" => Box::new(Expr::App(id, args)),
+    // Indexing and slicing is just syntactic sugar, not a binary op
+    <arr:BottomExpr> "[" <idx:TopExpr> "]"                     => Box::new(Expr::App("arrayElemAt".to_string(),    vec![arr, idx])),
+    <arr:BottomExpr> "[" ":" <len:TopExpr> "]"                 => Box::new(Expr::App("slice".to_string(),          vec![arr, len])),
+    <arr:BottomExpr> "[" <pos:TopExpr> ":" <len:TopExpr> "]"   => Box::new(Expr::App("slice".to_string(),          vec![arr, pos, len])),
+    <str:BottomExpr> "[[" <idx:TopExpr> "]]"                   => Box::new(Expr::App("substrCP".to_string(),       vec![str, idx, Box::new(Expr::Number(1))])),
+    <str:BottomExpr> "[[" <pos:TopExpr> ":" <len:TopExpr> "]]" => Box::new(Expr::App("substrCP".to_string(),       vec![str, pos, len])),
     ArrayExpr,
     "(" <TopExpr> ")",
 };

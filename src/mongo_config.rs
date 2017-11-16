@@ -125,7 +125,7 @@ lazy_static! {
              "substrCP"        => MongoFuncInfo{arity: Arity::Fixed(3)},
              "toLower"         => MongoFuncInfo{arity: Arity::Fixed(1)},
              "toUpper"         => MongoFuncInfo{arity: Arity::Fixed(1)},
-             "arrayElementAt"  => MongoFuncInfo{arity: Arity::Fixed(2)},
+             "arrayElemAt"     => MongoFuncInfo{arity: Arity::Fixed(2)},
              "arrayToObject"   => MongoFuncInfo{arity: Arity::Fixed(1)},
              "concatArrays"    => MongoFuncInfo{arity: Arity::Variadic(2)},
              "indexOfArray"    => MongoFuncInfo{arity: Arity::Optional(2,4)},

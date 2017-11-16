@@ -37,7 +37,7 @@ impl Convert<Option<Box<JsonType>>> for Expr {
               Expr::Filter(f)     => f.convert(),
               Expr::Reduce(r)     => r.convert(),
               Expr::Zip(z)        => z.convert(),
-              Expr::App(s,args)   => {
+              Expr::App(s,args)   => {  
                  obox!(O(linked_hash_map![
                                             "$".to_string() + &s => 
                                              if args.len() > 1 { args.convert() } 
