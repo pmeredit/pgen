@@ -7744,11 +7744,11 @@ fn __action6<
     (_, i, _): (usize, Box<Expr>, usize),
     (_, id, _): (usize, String, usize),
     (_, _, _): (usize, &'input str, usize),
-    (_, e, _): (usize, Box<Expr>, usize),
+    (_, c, _): (usize, Box<Expr>, usize),
 ) -> Box<Expr>
 {
-    Box::new(Expr::Map(
-	    Box::new(Map{input: i, ename: id, expr: e})))
+    Box::new(Expr::Filter(
+	    Box::new(Filter{input: i, ename: id, cond: c})))
 }
 
 #[allow(unused_variables)]

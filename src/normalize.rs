@@ -41,6 +41,7 @@ impl Normalize for Expr {
             Switch(sw)     => Ok(Box::new(Switch(sw.normalize()?))),
             Let(l)         => Ok(Box::new(Let(l.normalize()?))),
             Map(m)         => Ok(Box::new(Map(m.normalize()?))),
+            Filter(f)      => Ok(Box::new(Filter(f.normalize()?))),
             Object(o)      => {
                                 let o: Result<Vec<(String, Box<Expr>)>, String> = o.into_iter()
                                                                                    .map(|(k,v)| {Ok((k, v.normalize()?))})

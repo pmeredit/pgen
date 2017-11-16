@@ -1,0 +1,7 @@
+project: {
+   'x': filter "$y" 
+        as foo
+	where let x=42 
+	   in
+	   foo == 1
+}

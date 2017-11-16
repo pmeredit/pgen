@@ -34,9 +34,9 @@ pub TopExpr: Box<Expr> =  {
     "map" <i:OrExpr> <id:OptionalAs> "in" <e:TopExpr> =>
         Box::new(Expr::Map(
 	    Box::new(Map{input: i, ename: id, expr: e}))),
-    "filter" <i:OrExpr> <id:OptionalAs> "where" <e:TopExpr> =>
-        Box::new(Expr::Map(
-	    Box::new(Map{input: i, ename: id, expr: e}))),
+    "filter" <i:OrExpr> <id:OptionalAs> "where" <c:TopExpr> =>
+        Box::new(Expr::Filter(
+	    Box::new(Filter{input: i, ename: id, cond: c}))),
     "if" <i:OrExpr> "then" <t:OrExpr> "else" <e:OrExpr> =>
      	Box::new(Expr::Cond(
 	    Box::new(Cond{cond:i, then:t, otherwise:e}))),
