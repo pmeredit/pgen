@@ -1,6 +1,4 @@
 project: {
-   // Should add actual translations for filter, map, zip, and reduce
-   // since they introduce variables.  Should never need to see $$
    'x': map "$y" 
         as foo
 	in let x=42 
