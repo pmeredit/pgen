@@ -161,7 +161,6 @@ impl Normalize for Zip {
         };
         match *inputs {
             Expr::Array(ref v) => {
-                let vlen = v.len();
                 match defaults {
                     None => (),
                     Some(ref d) => {

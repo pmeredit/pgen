@@ -143,6 +143,8 @@ MulOp: Opcode = {
 
 ExpOp: Opcode = {
     "**" => Opcode::Exp,
+    "++" => Opcode::StrCat,
+    "@"  => Opcode::ArrCat,
 };
 
 BottomExpr: Box<Expr> = {

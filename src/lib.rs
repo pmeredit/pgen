@@ -13,8 +13,8 @@ extern crate serde_json;
 #[macro_use]
 extern crate indoc;
 
-#[macro_use(bson, doc)]
-extern crate bson;
+//#[macro_use(bson, doc)]
+//extern crate bson;
 
 #[macro_use]
 extern crate lazy_static;

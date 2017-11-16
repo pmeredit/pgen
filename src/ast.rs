@@ -237,6 +237,8 @@ pub enum Opcode {
     And,
     Or,
     Exp,
+    ArrCat,
+    StrCat,
 }
 
 impl Opcode {
@@ -244,20 +246,22 @@ impl Opcode {
     pub fn to_func_str(&self) -> &'static str {
         use self::Opcode::*;
         match *self {
-            Mul => "multiply",
-            Div => "divide",
-            Mod => "mod",
-            Add => "add",
-            Sub => "subtract",
-            Eq  => "eq",
-            Neq => "ne",
-            Lte => "lte",
-            Gte => "gte",
-            Lt  => "lt",
-            Gt  => "gt",
-            And => "and",
-            Or  => "or",
-            Exp => "pow",
+            Mul    => "multiply",
+            Div    => "divide",
+            Mod    => "mod",
+            Add    => "add",
+            Sub    => "subtract",
+            Eq     => "eq",
+            Neq    => "ne",
+            Lte    => "lte",
+            Gte    => "gte",
+            Lt     => "lt",
+            Gt     => "gt",
+            And    => "and",
+            Or     => "or",
+            Exp    => "pow",
+            ArrCat => "concatArrays",
+            StrCat => "concat",
         }
     }
 

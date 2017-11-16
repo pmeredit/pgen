@@ -1,8 +1,5 @@
 extern crate serde_json;
 
-use ::codegen::JsonType::*;
-use linked_hash_map::LinkedHashMap;
-
 #[test]
 fn serialize_test() {
         let x = O(
