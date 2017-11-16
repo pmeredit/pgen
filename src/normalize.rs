@@ -42,6 +42,7 @@ impl Normalize for Expr {
             Let(l)         => Ok(Box::new(Let(l.normalize()?))),
             Map(m)         => Ok(Box::new(Map(m.normalize()?))),
             Filter(f)      => Ok(Box::new(Filter(f.normalize()?))),
+            Reduce(r)      => Ok(Box::new(Reduce(r.normalize()?))),
             Zip(z)         => Ok(Box::new(Zip(z.normalize()?))),
             Object(o)      => {
                                 let o: Result<Vec<(String, Box<Expr>)>, String> = o.into_iter()
@@ -140,6 +141,14 @@ impl Normalize for Filter {
         Ok(Box::new(Filter{input: self.input.normalize()?,
                            ename: self.ename,
                            cond:  self.cond.normalize()?}))
+    }
+}
+
+impl Normalize for Reduce {
+    fn normalize(self) -> Result<Box<Self>, String> {
+        Ok(Box::new(Reduce{input: self.input.normalize()?,
+                           init:  self.init.normalize()? ,
+                           expr:  self.expr.normalize()?  }))
     }
 }
 

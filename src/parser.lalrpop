@@ -14,7 +14,8 @@ match {
     r"\$\w+"                                   => COLUMN,
     r"[a-zA-Z_]\w*"                            => IDENTIFIER,
     "let","=", "in", "filter", "map",
-    "zip", "defaults", "reduce", "as", "where",
+    "zip", "defaults", "as", "where",
+    "reduce", "start", "with", "using",
     "if", "then", "else",
     "switch", "=>", "default",
     "{","}","[","]", "(", ")",
@@ -31,12 +32,15 @@ pub TopExpr: Box<Expr> =  {
     "let" <a:Assignments> "in" <e:TopExpr> => 
  	Box::new(Expr::Let(
 	    Box::new(Let{assignments: a, expr: e}))),
-    "map" <i:OrExpr> <id:OptionalAs> "in" <e:TopExpr> =>
+    "map" <i:OrExpr> <id:OptionalAs> InOrUsing <e:TopExpr> =>
         Box::new(Expr::Map(
 	    Box::new(Map{input: i, ename: id, expr: e}))),
     "filter" <i:OrExpr> <id:OptionalAs> "where" <c:TopExpr> =>
         Box::new(Expr::Filter(
 	    Box::new(Filter{input: i, ename: id, cond: c}))),
+    "reduce" <i:OrExpr> "start" "with" <init:OrExpr> InOrUsing <e:TopExpr> =>
+        Box::new(Expr::Reduce(
+	    Box::new(Reduce{input: i, init: init, expr: e}))),
     "zip" <i:ArrayExpr> <d:OptionalDefault> =>
         Box::new(Expr::Zip(
 	    Box::new(Zip{inputs: i, longest: match d { None => false, _=> true }, defaults: d}))),
@@ -47,6 +51,11 @@ pub TopExpr: Box<Expr> =  {
     	Box::new(Expr::Switch(
 	    Box::new(Switch{cases:c, default:d}))),
     OrExpr,
+};
+
+InOrUsing: () = {
+   "in"    => (),
+   "using" => (),
 };
 
 OptionalAs: String = {

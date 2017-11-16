@@ -35,6 +35,7 @@ impl Convert<Option<Box<JsonType>>> for Expr {
               Expr::Let(l)        => l.convert(),
               Expr::Map(m)        => m.convert(),
               Expr::Filter(f)     => f.convert(),
+              Expr::Reduce(r)     => r.convert(),
               Expr::Zip(z)        => z.convert(),
               Expr::App(s,args)   => {
                  obox!(O(linked_hash_map![
@@ -254,6 +255,37 @@ impl Convert<Option<Box<JsonType>>> for Filter {
                 ))
     }
 }
+
+
+//  {
+//     "$reduce":
+//       {
+//         "input"        : expr,
+//         "initialValue" : expr,
+//         "in"           : expr
+//       }
+//  }
+//
+impl Convert<Option<Box<JsonType>>> for Reduce {
+    fn convert(self) -> Option<Box<JsonType>> {
+        use self::JsonType::*;
+        let input: Option<Box<JsonType>> = self.input.convert();
+        let init:  Option<Box<JsonType>> = self.init.convert();
+        let expr:  Option<Box<JsonType>> = self.expr.convert();
+        obox!(O(
+            linked_hash_map![
+                "$reduce".to_string() => 
+                     obox!(O(linked_hash_map![
+                             "input".to_string()           => input,
+                             "initialValue".to_string()    => init,
+                             "in".to_string()              => expr
+                                       ]
+                          ))
+                ]
+                ))
+    }
+}
+
 
 //  {
 //     "$zip":

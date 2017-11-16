@@ -36,6 +36,13 @@ pub struct Filter{
 }
 
 #[derive(Debug)] 
+pub struct Reduce{
+    pub input: Box<Expr>, 
+    pub init:  Box<Expr>, 
+    pub expr:  Box<Expr>,
+}
+
+#[derive(Debug)] 
 pub struct Zip{
     pub inputs:   Box<Expr>, 
     pub longest:  bool, 
@@ -70,6 +77,7 @@ pub enum Expr {
     Let(Box<Let>),
     Map(Box<Map>),
     Filter(Box<Filter>),
+    Reduce(Box<Reduce>),
     Zip(Box<Zip>),
     App(String, Vec<Box<Expr>>),
     Array(Vec<Box<Expr>>),
@@ -126,6 +134,14 @@ impl Expr {
                     // Remove assigned name from free vars
                     ret.remove(&f.ename);
                 }
+                Reduce(ref r) => {
+                    aux(&*r.input, &mut ret);
+                    aux(&*r.init,  &mut ret);
+                    aux(&*r.expr,  &mut ret);
+                    // Remove value and this from free vars
+                    ret.remove("value");
+                    ret.remove("this");
+                }
                 Zip(ref z) => {
                     aux(&*z.inputs,   &mut ret);
                     match z.defaults.as_ref() {
@@ -165,7 +181,8 @@ impl Expr {
             Let(_)    => "Let Expression",
             Map(_)    => "Map Expression",
             Filter(_) => "Filter Expression",
-            Zip(_) => "Zip Expression",
+            Reduce(_) => "Reduce Expression",
+            Zip(_)    => "Zip Expression",
             App(_,_)  => "Function Application",
             Array(_)  => "Array",
             Object(_) => "Object",

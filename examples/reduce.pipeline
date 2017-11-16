@@ -1,0 +1,10 @@
+project: { 
+      'x': reduce (
+                 filter range(1,10) 
+		 as foo 
+		 where 
+	                let x = foo ** 4 in x + 42 < 200
+		) 
+           start with 42 
+	   using value * this
+	  }
