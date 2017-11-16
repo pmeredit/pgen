@@ -20,13 +20,13 @@ pub struct PipelineItem {
     // Object, we will catch in normalize
     // rather than the parser, and give a better
     // error message
-    pub object: Box<Expr>,
+    pub object:     Box<Expr>,
 }
 
 #[derive(Debug)]
 pub struct Let {
     pub assignments: Vec<(String, Box<Expr>)>,
-    pub expr: Box<Expr>,
+    pub expr:        Box<Expr>,
 }
 
 #[derive(Debug)] 
@@ -59,14 +59,14 @@ pub struct Zip{
 
 #[derive(Debug)]
 pub struct Cond {
-    pub cond: Box<Expr>,
-    pub then: Box<Expr>,
+    pub cond:      Box<Expr>,
+    pub then:      Box<Expr>,
     pub otherwise: Box<Expr>,
 }
 
 #[derive(Debug)]
 pub struct Switch {
-    pub cases: Vec<(Box<Expr>, Box<Expr>)>,
+    pub cases:   Vec<(Box<Expr>, Box<Expr>)>,
     pub default: Box<Expr>,
 }
 

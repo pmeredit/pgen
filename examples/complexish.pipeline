@@ -1,19 +1,19 @@
 project: { 
       'x': reduce (
                  filter (
-		          map range(1,10) 
+		          map range(1,10) @ [-42,-43,44,$z]
 			  as  x
 			  using x ** 3 + $z
 			 )
 		 as foo 
 		 where 
-	                let x = foo ** 4 in x + 42 < 200
+	                let x = foo ** 3 in x + 42 < 400
 		) 
            start with 42 
 	   using value * this
 	  };
 group: {
-      '_id': $x,
+      '_id': "hello" ++ "\"world\"",
       // We need to ensure that there is a accumlator function at the top level
       // for non-'_id' fields.  Currently, we do not enforce that, and we don't
       // fail until we send it to the server

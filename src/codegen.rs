@@ -25,7 +25,7 @@ impl Convert<Option<Box<JsonType>>> for Expr {
               Expr::Number(n)     => obox!(I(n)),
               Expr::Float(f)      => obox!(F(f)),
               Expr::Bool(b)       => obox!(B(b)),
-              Expr::Str(s)        => obox!(S(s)),
+              Expr::Str(s)        => obox!(S(s.replace(r#"\"#, r#""#))),
               // Variables introduced by let should have $$ prefixed
               Expr::ID(s)         => obox!(S("$$".to_string() + &s)),
               // Cols still have $ prefixed, whereas IDs did not
