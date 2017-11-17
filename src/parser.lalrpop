@@ -69,7 +69,7 @@ OptionalDefault: Option<Box<Expr>> = {
 };
 
 PipelineItem: PipelineItem = {
-    <id:ID> ":" <o:TopExpr> => PipelineItem{stage_name: id, object: o}
+    <id:ID> ":" <o:TopExpr> => PipelineItem{stage_name: id, stage: o}
 };
 
 

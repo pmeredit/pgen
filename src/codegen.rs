@@ -17,6 +17,10 @@ pub trait Convert<T> {
     fn convert(self) -> T;
 }
 
+pub trait ConvertMatch<T> {
+    fn convert_match(self) -> T;
+}
+
 impl Convert<Option<Box<JsonType>>> for Expr {
      fn convert(self) -> Option<Box<JsonType>> {
           use self::JsonType::*;
@@ -92,9 +96,9 @@ impl Convert<Option<Box<JsonType>>> for Pipeline {
         use self::JsonType::*;
         let ret: Vec<Option<Box<JsonType>>> = self.stages
                                                   .into_iter()
-                                                  .map(|PipelineItem{stage_name, object}| {
+                                                  .map(|PipelineItem{stage_name, stage}| {
                                                               obox!(O(
-                                                                      linked_hash_map!["$".to_string() + &stage_name => object.convert()]
+                                                                      linked_hash_map!["$".to_string() + &stage_name => stage.convert()]
                                                                       ))
                                                            }
                                                       )

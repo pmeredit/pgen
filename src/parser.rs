@@ -9149,7 +9149,7 @@ fn __action18<
     (_, o, _): (usize, Box<Expr>, usize),
 ) -> PipelineItem
 {
-    PipelineItem{stage_name: id, object: o}
+    PipelineItem{stage_name: id, stage: o}
 }
 
 #[allow(unused_variables)]

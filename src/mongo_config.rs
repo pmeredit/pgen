@@ -10,9 +10,6 @@ pub enum Arity {
     Variadic(usize),
     // Optional arguments, usize, usize = min, max
     Optional(usize, usize),
-    // Match has different number of arguments in the context of match
-    // second number is outside of match
-    Match(usize, usize),
 }
 
 // This will be any meta info for a function that we want to check
@@ -55,7 +52,36 @@ lazy_static! {
             "count",
             "graphLookup"
         ];
-    pub static ref FUNCTIONS: HashMap<&'static str, MongoFuncInfo> =
+    pub static ref MATCH_FUNCTIONS: HashMap<&'static str, MongoFuncInfo> =
+        hash_map![
+             "eq"              => MongoFuncInfo{arity: Arity::Fixed(1)},
+             "gt"              => MongoFuncInfo{arity: Arity::Fixed(1)},
+             "gte"             => MongoFuncInfo{arity: Arity::Fixed(1)},
+             "in"              => MongoFuncInfo{arity: Arity::Fixed(1)},
+             "lt"              => MongoFuncInfo{arity: Arity::Fixed(1)},
+             "lte"             => MongoFuncInfo{arity: Arity::Fixed(1)},
+             "ne"              => MongoFuncInfo{arity: Arity::Fixed(1)},
+             "nin"             => MongoFuncInfo{arity: Arity::Fixed(1)},
+             // logical
+             "and"             => MongoFuncInfo{arity: Arity::Variadic(1)},
+             "not"             => MongoFuncInfo{arity: Arity::Variadic(1)},
+             "nor"             => MongoFuncInfo{arity: Arity::Variadic(1)},
+             "or"              => MongoFuncInfo{arity: Arity::Variadic(1)},
+             // element
+             "exists"          => MongoFuncInfo{arity: Arity::Fixed(1)},
+             "type"            => MongoFuncInfo{arity: Arity::Fixed(1)},
+             // eval
+             "mod"             => MongoFuncInfo{arity: Arity::Fixed(2)},
+             "regex"           => MongoFuncInfo{arity: Arity::Fixed(1)},
+             //TODO: text, where, geo, bitwise, comment
+             // array
+             "all"             => MongoFuncInfo{arity: Arity::Variadic(1)},
+             "elemMatch"       => MongoFuncInfo{arity: Arity::Fixed(1)},
+             "size"            => MongoFuncInfo{arity: Arity::Fixed(1)},
+             // expr
+             "expr"            => MongoFuncInfo{arity: Arity::Fixed(1)}
+        ];
+    pub static ref AGG_FUNCTIONS: HashMap<&'static str, MongoFuncInfo> =
         hash_map![
              //special functions argument must be an object
              "map"             => MongoFuncInfo{arity: Arity::Fixed(1)},
@@ -75,16 +101,14 @@ lazy_static! {
              "last"            => MongoFuncInfo{arity: Arity::Fixed(1)},
              "push"            => MongoFuncInfo{arity: Arity::Fixed(1)},
              "addToSet"        => MongoFuncInfo{arity: Arity::Fixed(1)},
-             //acts differently in match, for now just encoded as optional
-             //eventually we should make this match sensitive
-             "eq"              => MongoFuncInfo{arity: Arity::Match(1,2)},
-             "ne"              => MongoFuncInfo{arity: Arity::Match(1,2)},
-             "gt"              => MongoFuncInfo{arity: Arity::Match(1,2)},
-             "gte"             => MongoFuncInfo{arity: Arity::Match(1,2)},
-             "lt"              => MongoFuncInfo{arity: Arity::Match(1,2)},
-             "lte"             => MongoFuncInfo{arity: Arity::Match(1,2)},
-             "in"              => MongoFuncInfo{arity: Arity::Match(1,2)},
-             "nin"             => MongoFuncInfo{arity: Arity::Match(1,2)},
+             "eq"              => MongoFuncInfo{arity: Arity::Fixed(2)},
+             "ne"              => MongoFuncInfo{arity: Arity::Fixed(2)},
+             "gt"              => MongoFuncInfo{arity: Arity::Fixed(2)},
+             "gte"             => MongoFuncInfo{arity: Arity::Fixed(2)},
+             "lt"              => MongoFuncInfo{arity: Arity::Fixed(2)},
+             "lte"             => MongoFuncInfo{arity: Arity::Fixed(2)},
+             "in"              => MongoFuncInfo{arity: Arity::Fixed(2)},
+             "nin"             => MongoFuncInfo{arity: Arity::Fixed(2)},
              //normal functions
              "not"             => MongoFuncInfo{arity: Arity::Fixed(1)},
              "and"             => MongoFuncInfo{arity: Arity::Variadic(1)},

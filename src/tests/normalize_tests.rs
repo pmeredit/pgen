@@ -1,5 +1,4 @@
 #[test]
 fn normalize_test() {
-    assert!(::mongo_config::FUNCTIONS.contains_key("not"));
-    assert!(::mongo_config::FUNCTIONS.contains_key(String::from("not").as_str()));
+    assert!(::mongo_config::AGG_FUNCTIONS.contains_key("not"));
 }
