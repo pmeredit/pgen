@@ -1,8 +1,0 @@
-match: {
-        // Only simple match conditions work right now
-        // '$or'  : [$x != 'A', $y != 'B'],
-	// this works fine, but isn't pretty
-	// define a new match logic, and have pipelines consist 
-	// of PipelineItems or Match expressions
-	'x'    : ne(23)
-}

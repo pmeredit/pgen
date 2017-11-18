@@ -112,7 +112,12 @@ impl Normalize for Pipeline {
             }
             if stage_name == "match" {
                 check_vars(&*stage, i, &stage_name)?;
-                stages.push(PipelineItem{stage_name, stage: stage.match_normalize()?});    
+                if let Expr::Object(_) = *stage {
+                    stages.push(PipelineItem{stage_name, stage: stage.match_normalize()?});
+                } else {
+                    stages.push(PipelineItem{stage_name, stage: 
+                        Box::new(Expr::App("expr".to_string(), vec![stage.agg_normalize()?]))});
+                }
             }
             else if let Expr::Object(_) = *stage {
                 check_vars(&*stage, i, &stage_name)?;
