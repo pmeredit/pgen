@@ -1,5 +1,5 @@
 match: let z =1, x=20 
-        in $z == z || $z == x;
+        in inArray("$z", [z,x]);
 project: { 
       'x': reduce (
                  filter (

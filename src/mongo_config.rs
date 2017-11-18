@@ -107,7 +107,7 @@ lazy_static! {
              "gte"             => MongoFuncInfo{arity: Arity::Fixed(2)},
              "lt"              => MongoFuncInfo{arity: Arity::Fixed(2)},
              "lte"             => MongoFuncInfo{arity: Arity::Fixed(2)},
-             "in"              => MongoFuncInfo{arity: Arity::Fixed(2)},
+             "inArray"         => MongoFuncInfo{arity: Arity::Fixed(2)},
              "nin"             => MongoFuncInfo{arity: Arity::Fixed(2)},
              //normal functions
              "not"             => MongoFuncInfo{arity: Arity::Fixed(1)},

@@ -43,7 +43,10 @@ impl Convert<Option<Box<JsonType>>> for Expr {
               Expr::Zip(z)        => z.convert(),
               Expr::App(s,args)   => {  
                  obox!(O(linked_hash_map![
-                                            "$".to_string() + &s => 
+                                            // check for inArray, we had to use that because in is a
+                                            // keyword
+                                            "$".to_string() + if s == "inArray" { "in" } else { &s } 
+                                                 => 
                                              if args.len() > 1 { args.convert() } 
                                              else              { args.into_iter().nth(0).convert() }
                                          ]
