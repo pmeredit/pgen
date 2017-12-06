@@ -13,44 +13,53 @@ pub enum JsonType {
     O(LinkedHashMap<String, Option<Box<JsonType>>>),
 }
 
+fn pad(depth: u32) -> String {
+    (0..depth).map(|_| "\t").collect()
+}
+
+// TODO: Make all to_go_bson use Cow
+pub fn to_go_bson(input: &Option<Box<JsonType>>) -> String {
+    input.to_go_bson(0)
+}
+
 pub trait ToGoBson {
-    fn to_go_bson(&self) -> String;
+    fn to_go_bson(&self, depth: u32) -> String;
 }
 
 impl ToGoBson for Option<Box<JsonType>> {
-    fn to_go_bson(&self) -> String {
+    fn to_go_bson(&self, depth: u32) -> String {
         match *self {
             None => "null".to_string(),
-            Some(ref j) => j.to_go_bson()
+            Some(ref j) => j.to_go_bson(depth)
         }
     }
 }
 
 impl ToGoBson for JsonType {
-    fn to_go_bson(&self) -> String {
+    fn to_go_bson(&self, depth: u32) -> String {
         use self::JsonType::*;
         match *self {
-            I(ref i) => i.to_string(),
-            F(ref f) => f.to_string(),
-            B(ref b) => b.to_string(),
-            S(ref s) => "\"".to_string() + &s + "\"",
+            I(ref i) => pad(depth) + &i.to_string(), 
+            F(ref f) => pad(depth) + &f.to_string(),
+            B(ref b) => pad(depth) + &b.to_string(),
+            S(ref s) => pad(depth) + "\"" + &s + "\"",
             A(ref v) => {
-                "[]bson.D{".to_string() +
+                pad(depth) + "[]interface{}{\n" +
                 v.iter().fold("".to_string(), 
                     |acc, ref x|  acc + match **x {
-                          None => "null".to_string(),
-                          Some(ref y) => y.to_go_bson()
-                          }.as_str() + ","
-                      ).as_str() + "}"
+                          None => pad(depth + 1) + "null",
+                          Some(ref y) => y.to_go_bson(depth + 1) + "\n" + &pad(depth + 1)
+                          }.as_str() + ",\n"
+                      ).as_str() + &pad(depth) + "}"
             },
             O(ref o) => {
-                "bson.D{".to_string() +
+                pad(depth) + "bson.D{\n" +
                 o.iter().fold("".to_string(), 
                     |acc, (ref k, ref v)|  acc + match **v {
-                          None => "{\"".to_string() + &k + "\",null" + "}",
-                          Some(ref y) => "{\"".to_string() +  &k + "\"," + y.to_go_bson().as_str() + "}"
-                          }.as_str() + ","
-                      ).as_str() + "}"
+                          None => pad(depth + 1) + "{\"" + &k + "\",null" + "}",
+                          Some(ref y) => pad(depth + 1) + "{\"" +  &k + "\",\n" + &y.to_go_bson(depth + 1) + "\n" + &pad(depth + 1) + "}"
+                          }.as_str() + ",\n"
+                      ).as_str() + &pad(depth) + "}"
             },
         }
     }

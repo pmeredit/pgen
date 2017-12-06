@@ -27,7 +27,7 @@ fn main() {
                          println!("************");
                          println!("Json: \n{}", serde_json::to_string(&json).unwrap());
                          println!("************");
-                         println!("Go Bson: \n{}", json.to_go_bson());
+                         println!("Go Bson: \n{}", to_go_bson(&json));
                      }
                      Err(e) => println!("{}", e)
                 }
