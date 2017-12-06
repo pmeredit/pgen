@@ -1,0 +1,8 @@
+project: {
+	"out": let input = "hello world"
+	       in
+	       reduce range(0,strLenCP(input))
+	       start with ''
+	       using substrCP(input, this, 1) ++ value
+			   
+}
