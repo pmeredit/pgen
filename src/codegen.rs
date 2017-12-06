@@ -13,6 +13,49 @@ pub enum JsonType {
     O(LinkedHashMap<String, Option<Box<JsonType>>>),
 }
 
+pub trait ToGoBson {
+    fn to_go_bson(&self) -> String;
+}
+
+impl ToGoBson for Option<Box<JsonType>> {
+    fn to_go_bson(&self) -> String {
+        match *self {
+            None => "null".to_string(),
+            Some(ref j) => j.to_go_bson()
+        }
+    }
+}
+
+impl ToGoBson for JsonType {
+    fn to_go_bson(&self) -> String {
+        use self::JsonType::*;
+        match *self {
+            I(ref i) => i.to_string(),
+            F(ref f) => f.to_string(),
+            B(ref b) => b.to_string(),
+            S(ref s) => "\"".to_string() + &s + "\"",
+            A(ref v) => {
+                "[]bson.D{".to_string() +
+                v.iter().fold("".to_string(), 
+                    |acc, ref x|  acc + match **x {
+                          None => "null".to_string(),
+                          Some(ref y) => y.to_go_bson()
+                          }.as_str() + ","
+                      ).as_str() + "}"
+            },
+            O(ref o) => {
+                "bson.D{".to_string() +
+                o.iter().fold("".to_string(), 
+                    |acc, (ref k, ref v)|  acc + match **v {
+                          None => "{\"".to_string() + &k + "\",null" + "}",
+                          Some(ref y) => "{\"".to_string() +  &k + "\"," + y.to_go_bson().as_str() + "}"
+                          }.as_str() + ","
+                      ).as_str() + "}"
+            },
+        }
+    }
+}
+
 pub trait Convert<T> {
     fn convert(self) -> T;
 }
