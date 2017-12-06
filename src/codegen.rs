@@ -48,7 +48,7 @@ impl ToGoBson for JsonType {
                 v.iter().fold("".to_string(), 
                     |acc, ref x|  acc + match **x {
                           None => pad(depth + 1) + "null",
-                          Some(ref y) => y.to_go_bson(depth + 1) + "\n" + &pad(depth + 1)
+                          Some(ref y) => y.to_go_bson(depth + 1)
                           }.as_str() + ",\n"
                       ).as_str() + &pad(depth) + "}"
             },
@@ -56,8 +56,8 @@ impl ToGoBson for JsonType {
                 pad(depth) + "bson.D{\n" +
                 o.iter().fold("".to_string(), 
                     |acc, (ref k, ref v)|  acc + match **v {
-                          None => pad(depth + 1) + "{\"" + &k + "\",null" + "}",
-                          Some(ref y) => pad(depth + 1) + "{\"" +  &k + "\",\n" + &y.to_go_bson(depth + 1) + "\n" + &pad(depth + 1) + "}"
+                          None => pad(depth + 1) + "{\"" + &k + "\",null" + "},",
+                          Some(ref y) => pad(depth + 1) + "{\"" +  &k + "\",\n" + &y.to_go_bson(depth + 1) + ",\n" + &pad(depth + 1) + "}"
                           }.as_str() + ",\n"
                       ).as_str() + &pad(depth) + "}"
             },
