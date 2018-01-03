@@ -1,5 +1,5 @@
 project: { 
-      'out': let l = strLenCP($v) - 1 in
+      'out': let out = let l = strLenCP($v) - 1 in
       		reduce range(0, l + 1)
              	start with 0
 	     	using let ch = substrCP($v, this, 1) in
@@ -14,7 +14,8 @@ project: {
 				ch == '6' => 6 * pow(10, l - this), 
 				ch == '7' => 7 * pow(10, l - this), 
 				ch == '8' => 8 * pow(10, l - this), 
-				ch == '9' => 8 * pow(10, l - this), 
+				ch == '9' => 9 * pow(10, l - this), 
 	        		default: null
-				} )
+				} ) in
+		if out == null then 0 else out
 	 }
