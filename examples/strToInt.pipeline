@@ -1,0 +1,20 @@
+project: { 
+      'out': let l = strLenCP($v) - 1 in
+      		reduce range(0, l + 1)
+             	start with 0
+	     	using let ch = substrCP($v, this, 1) in
+			value + 
+				( switch {
+	        		ch == '0' => 0,
+				ch == '1' => 1 * pow(10, l - this),
+				ch == '2' => 2 * pow(10, l - this), 
+				ch == '3' => 3 * pow(10, l - this), 
+				ch == '4' => 4 * pow(10, l - this), 
+				ch == '5' => 5 * pow(10, l - this), 
+				ch == '6' => 6 * pow(10, l - this), 
+				ch == '7' => 7 * pow(10, l - this), 
+				ch == '8' => 8 * pow(10, l - this), 
+				ch == '9' => 8 * pow(10, l - this), 
+	        		default: null
+				} )
+	 }
