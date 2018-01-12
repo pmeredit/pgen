@@ -1,0 +1,5 @@
+project: { 
+      'x': if abs($v % 1) < .5 
+           then (if $v < 0 then ceil($v) else floor($v))
+           else (if $v < 0 then floor($v) else ceil($v))                 
+	 }

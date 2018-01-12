@@ -1,0 +1,8 @@
+project: { "out" : let split = split($v, $from_str)
+                   in reduce 
+		   	split
+			start with ''
+			using if value == '' 
+			      then this
+			      else concat(value, $to_str, this)
+	}
