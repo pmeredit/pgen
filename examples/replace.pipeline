@@ -1,8 +1,8 @@
 project: { "out" : let split = split($v, $from_str)
                    in reduce 
 		   	split
-			start with ''
-			using if value == '' 
+			start with 42
+			using if value == 42 
 			      then this
 			      else concat(value, $to_str, this)
 	}
