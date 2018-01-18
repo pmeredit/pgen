@@ -1,0 +1,4 @@
+project: { "out" : reduce range(0, $n)
+			start with ''
+			using value ++ ' '
+	}

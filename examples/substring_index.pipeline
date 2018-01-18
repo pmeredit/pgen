@@ -1,0 +1,11 @@
+project: { "out" : let delim = $delim, count = $count
+		   in
+                   let split = split($s, delim)
+                   in
+		   reduce 
+			split[:count]
+			start with null
+			using if value == null
+			      then this
+			      else concat(value, delim, this)
+	}
