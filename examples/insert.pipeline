@@ -1,8 +1,10 @@
-addFields: { "out" :    let actual_pos = $pos - 1, length = strLenCP($v) 
+addFields: { "out" :    if $v <= null || $pos <= null || $len <= null || $newstr <= null then null
+			else (
+			let actual_pos = $pos - 1, length = strLenCP($v) 
 			in 
 			if actual_pos <= 0 || actual_pos >= length
 			then $v
 			else
                         (let prefix = substrCP($v, 0, actual_pos), suffix = substrCP($v, actual_pos + $len, length)
-			in prefix ++ $newstr ++ suffix)
+			in prefix ++ $newstr ++ suffix))
 	}
