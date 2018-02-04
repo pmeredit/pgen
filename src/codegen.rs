@@ -32,11 +32,11 @@ impl ToGoBson for JsonType {
     fn to_go_bson(&self, depth: u32) -> String {
         use self::JsonType::*;
         match *self {
-            Null => pad(depth) + "nil",
-            I(ref i) => pad(depth) + &i.to_string(), 
-            F(ref f) => pad(depth) + &f.to_string(),
-            B(ref b) => pad(depth) + &b.to_string(),
-            S(ref s) => pad(depth) + "\"" + &s + "\"",
+            Null => format!("{}{}", pad(depth), "nil"),
+            I(i) => format!("{}{}", pad(depth), i.to_string()), 
+            F(f) => format!("{}{}", pad(depth), f.to_string()),
+            B(b) => format!("{}{}", pad(depth), b.to_string()),
+            S(ref s) => format!("{}\"{}\"", pad(depth), s),
             A(ref v) => {
                 pad(depth) + "[]interface{}{\n" +
                 v.iter().fold("".to_string(), 
