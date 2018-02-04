@@ -2,15 +2,6 @@ extern crate pgen;
 extern crate serde_json;
 extern crate clap;
 
-use pgen::normalize::Normalize;
-use pgen::codegen::*;
-
-fn run(file: &str) -> Result<Option<Box<JsonType>>, String> {
-   pgen::process_file(file)
-      .and_then(|pipeline| pipeline.normalize())
-      .and_then(|normalized| Ok(normalized.convert()))
-}
-
 #[cfg(not(test))]
 fn main() {
    use clap::{Arg, App};
@@ -42,10 +33,10 @@ fn main() {
    let pretty = matches.is_present("pretty");
    let gobson = matches.is_present("gobson");
    
-   match run(file) {
+   match pgen::run_all(file) {
        Ok(json) => {
            if gobson {
-               println!("{}", to_go_bson(&json));
+               println!("{}", pgen::codegen::to_go_bson(json));
            } else if pretty {
                println!("{}", serde_json::to_string_pretty(&json).unwrap());
            } else {
