@@ -16,6 +16,7 @@ bson = "0.10"
 serde_json = "1.0.6"
 serde = "1.0.20"
 serde_derive = "1.0.20"
+clap = "2.29.2"
 
 [dependencies.linked-hash-map]
 version = "0.5.0"

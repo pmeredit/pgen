@@ -1,36 +1,57 @@
 extern crate pgen;
 extern crate serde_json;
+extern crate clap;
+
+use pgen::normalize::Normalize;
+use pgen::codegen::*;
+
+fn run(file: &str) -> Result<Option<Box<JsonType>>, String> {
+   pgen::process_file(file)
+      .and_then(|pipeline| pipeline.normalize())
+      .and_then(|normalized| Ok(normalized.convert()))
+}
 
 #[cfg(not(test))]
 fn main() {
-        use std::env;
-        use pgen::normalize::Normalize;
-        use pgen::codegen::*;
+   use clap::{Arg, App};
 
-        let args: Vec<_> = env::args().collect();
-        if args.len() < 2 {
-            println!("Please pass a file to parse")
-        }
-        else {
-            let pipeline = pgen::process_file(&args[1]);
-            if let Some(pipeline) = pipeline {
-                println!("Pipeline:\n{:?}", pipeline);
+   let matches = App::new("Mongo DB Aggregation Pipeline Generator")
+       .version("0.3")
+       .author("Patrick Meredith <pmeredit@gmail.com>")
+       .about("Compiles an easy-to-use ML-like langauge to Mongo DB Aggregation Pipeline Json")
+       .arg(Arg::with_name("pretty")
+            .long("pretty")
+            .short("p")
+            .help("Sets pretty print on, off by default")
+            )
+       .arg(Arg::with_name("gobson")
+            .long("gobson")
+            .short("gb")
+            .help("Output pipeline in go bson")
+            .conflicts_with("pretty")
+            )
+       .arg(Arg::with_name("FILE")
+            .help("Sets the input file to use")
+            .required(true)
+            .index(1)
+            )
+       .get_matches();
 
-                println!("************");
-                let normal = pipeline.normalize();
-                match normal {
-                     Ok(normal)  => {
-                         println!("Normalized: \n{:?}", normal);
-                         println!("************");
-                         let json: Option<Box<JsonType>> = normal.convert();
-                         println!("Json: \n{}", serde_json::to_string_pretty(&json).unwrap());
-                         println!("************");
-                         println!("Json: \n{}", serde_json::to_string(&json).unwrap());
-                        // println!("************");
-                        // println!("Go Bson: \n{}", to_go_bson(&json));
-                     }
-                     Err(e) => println!("{}", e)
-                }
-            }
-        }
+
+   let file = matches.value_of("FILE").unwrap();
+   let pretty = matches.is_present("pretty");
+   let gobson = matches.is_present("gobson");
+   
+   match run(file) {
+       Ok(json) => {
+           if gobson {
+               println!("{}", to_go_bson(&json));
+           } else if pretty {
+               println!("{}", serde_json::to_string_pretty(&json).unwrap());
+           } else {
+               println!("{}", serde_json::to_string(&json).unwrap());
+           }
+       }
+       Err(e) => println!("{}", e)
+   }
 }

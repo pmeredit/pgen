@@ -31,7 +31,7 @@ pub mod normalize;
 pub mod mongo_config;
 mod tests;
 
-pub fn process_file(file_name: &str) -> Option<ast::Pipeline> {
+pub fn process_file(file_name: &str) -> Result<ast::Pipeline, String> {
     use std::fs::File;
     use std::io::prelude::*;
     use regex::Regex;
@@ -48,14 +48,5 @@ pub fn process_file(file_name: &str) -> Option<ast::Pipeline> {
     let contents = single_line_comment_re.replace_all(&contents, "");
     let contents = multiline_comment_re.replace_all(&contents, "");
 
-    let maybe_pipe = parser::parse_Pipeline(&contents);
-    match maybe_pipe {
-        Ok(p)  => {
-            return Some(p)
-        },  
-        Err(e) => {
-            println!("{:?}", e); 
-            return None
-        }   
-    }   
+    parser::parse_Pipeline(&contents).map_err(|e| format!("{:?}", e))
 }
