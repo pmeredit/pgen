@@ -15,7 +15,7 @@ project: {
 	   using value * this
 	  };
 group: {
-      '_id': ("hello" ++ "\"world\"" ++ " this is a bad id")[[6:4]],
+      '_id': ("hello" ++ "\"world\"" ++ " this is a bad id")[|6:4|],
       // We need to ensure that there is a accumlator function at the top level
       // for non-'_id' fields.  Currently, we do not enforce that, and we don't
       // fail until we send it to the server
