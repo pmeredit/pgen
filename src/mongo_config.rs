@@ -1,8 +1,8 @@
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 
 // TODO?: Add function replacements for things we don't currently have in
 // server??
-#[derive(Copy, Clone, Debug, PartialEq, Eq)] 
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Arity {
     // Fixed arity, usize = size
     Fixed(usize),
@@ -16,11 +16,10 @@ pub enum Arity {
 // in sanity.rs, currently we only check that the arity matches,
 // eventually we might also do type checking for literals (but it won't
 // save use from field values)
-#[derive(Copy, Clone, Debug, PartialEq, Eq)] 
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct MongoFuncInfo {
     pub arity: Arity,
 }
-
 
 // TODO: match isn't fully supported
 
