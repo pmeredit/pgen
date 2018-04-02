@@ -51,7 +51,7 @@ pub fn process_file(file_name: &str) -> Result<ast::Pipeline, String> {
     let contents = single_line_comment_re.replace_all(&contents, "");
     let contents = multiline_comment_re.replace_all(&contents, "");
 
-    parser::parse_Pipeline(&contents).map_err(|e| format!("{:?}", e))
+    parser::PipelineParser::new().parse(&contents).map_err(|e| format!("{:?}", e))
 }
 
 // run_all: processes a file then normalizes and converts
